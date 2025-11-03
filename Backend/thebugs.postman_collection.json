@@ -1,0 +1,554 @@
+{
+	"info": {
+		"_postman_id": "5f3e0e7a-02fe-422a-be4d-fcffca16fe4b",
+		"name": "thebugs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39235899"
+	},
+	"item": [
+		{
+			"name": "proyecto",
+			"item": [
+				{
+					"name": "insertar proyecto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Voluntariado FUNTER\",\n    \"capacity\": 20,\n    \"startDate\": \"2024-11-15T08:00:00\",\n    \"finalDate\": \"2024-12-31T08:00:00\",\n    \"institution\": \"FUNTER\",\n    \"description\": \"Ayudar al personal administrativo de FUNTER\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/project/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"project",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar proyectos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/project/projects",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"project",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar un proyecto",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/project/get/673c0b0879141f22c2600150",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"project",
+								"get",
+								"673c0b0879141f22c2600150"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "borrar un proyecto",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/project/6739642393bb2443c4035a15",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"project",
+								"6739642393bb2443c4035a15"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "asignar administrador a proyecto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/project/673c0b0879141f22c2600150/673c08b779141f22c2600148",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"project",
+								"673c0b0879141f22c2600150",
+								"673c08b779141f22c2600148"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "administrador",
+			"item": [
+				{
+					"name": "insertar administrador",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"carnet\": \"00402523\",\n    \"name\": \"Ivan Nolasco\",\n    \"email\": \"00402523@uca.edu.sv\",\n    \"password\": \"1234\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/administrator/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"administrator",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar administradores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/administrator/administrators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"administrator",
+								"administrators"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar un administrador por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/administrator/get/673c2a2a4e61067b67637434",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"administrator",
+								"get",
+								"673c2a2a4e61067b67637434"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar un administrador por ID Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/administrator/673c08b779141f22c2600148",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"administrator",
+								"673c08b779141f22c2600148"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "estudiante",
+			"item": [
+				{
+					"name": "insertar estudiante",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"carnet\": \"00051316\",\n    \"name\": \"Daniela Reina\",\n    \"hours\": 50,\n    \"email\": \"00051316@uca.edu.sv\",\n    \"password\": \"1234\",\n    \"careers\": []\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/student/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar un estudiante",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/student/get/673d8b1b1138b437c291e637",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"get",
+								"673d8b1b1138b437c291e637"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar estudiantes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/student/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "asignar carrera a estudiante",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/student/674e24a34df3e1bc509a5636/674a5f0d178e2a52c27739a6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"674e24a34df3e1bc509a5636",
+								"674a5f0d178e2a52c27739a6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "facultad",
+			"item": [
+				{
+					"name": "insertar facultad",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ciencias Sociales y Humanidades\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/faculty/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculty",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar facultades",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/faculty/faculties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculty",
+								"faculties"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar una facultad",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/faculty/get/6745631d1ebb2470e66eb701",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculty",
+								"get",
+								"6745631d1ebb2470e66eb701"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "carrera",
+			"item": [
+				{
+					"name": "insertar carrera",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ingeniería Informática\",\n    \"faculty\": []\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/career/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"career",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar carreras",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/career/careers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"career",
+								"careers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "asignar facultad a carrera",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/career/674a5f0d178e2a52c27739a6/6745631d1ebb2470e66eb701",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"career",
+								"674a5f0d178e2a52c27739a6",
+								"6745631d1ebb2470e66eb701"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar una carrera",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/career/get/674a5f0d178e2a52c27739a6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"career",
+								"get",
+								"674a5f0d178e2a52c27739a6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "solicitud",
+			"item": [
+				{
+					"name": "insertar solicitud",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2024-11-15T14:00:00.000Z\",\n    \"status\": false,\n    \"students\": [\"673d8b1b1138b437c291e637\"],\n    \"projects\": [\"673c2eb4e9e49e897d220370\"],\n    \"administrators\": []\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/petition/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"petition",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar solicitudes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/petition/petitions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"petition",
+								"petitions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar una solicitud",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/petition/get/674b85bc1857febdb4f42ae2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"petition",
+								"get",
+								"674b85bc1857febdb4f42ae2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "borrar una solicitud",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/petition/674b8bec1857febdb4f42aed",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"petition",
+								"674b8bec1857febdb4f42aed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "asignar administrador a solicitud",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/petition/674b8bf41857febdb4f42aef/674a936ff6520d030527f115",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"petition",
+								"674b8bf41857febdb4f42aef",
+								"674a936ff6520d030527f115"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
