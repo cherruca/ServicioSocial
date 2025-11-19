@@ -173,3 +173,48 @@ export const deletePetitionController = async (req, res, next) => {
         }
     }
 }
+
+/* 
+    controller to enroll a student to a project:
+        - validate data
+        - prevent duplicate enrollments
+        - create a new petition
+*/
+export const enrollProjectController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.body;
+
+        if (!studentId || !projectId) {
+            return next(createError(400, "Datos incompletos"));
+        }
+
+        // verificar si ya existe una solicitud igual
+        const existing = await Petition.findOne({
+            students: studentId,
+            projects: projectId
+        });
+
+        if (existing) {
+            return next(createError(400, "Ya enviaste una solicitud para este proyecto"));
+        }
+
+        const petitionData = {
+            date: Date.now(),
+            status: false, // pendiente
+            students: [studentId],
+            projects: [projectId],
+            administrators: []
+        };
+
+        const created = await savePetition(petitionData);
+
+        res.status(201).json({
+            message: "Solicitud enviada correctamente",
+            data: created
+        });
+
+    } catch (e) {
+        next(createError(500, "Error al inscribirse al proyecto"));
+    }
+};
+
