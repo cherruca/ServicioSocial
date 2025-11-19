@@ -218,3 +218,19 @@ export const enrollProjectController = async (req, res, next) => {
     }
 };
 
+export const unassignProjectFromPetitionController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.params;
+
+        const petition = await findPetitionByStudentAndProject(studentId, projectId);
+        if (!petition) throw createError(404, "La inscripción no existe");
+
+        await unassignProjectFromPetition(petition._id, studentId, projectId);
+
+        res.status(200).json({ message: "Inscripción eliminada correctamente" });
+    } catch (e) {
+        next(e);
+    }
+};
+
+

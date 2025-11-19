@@ -21,7 +21,7 @@ const updateProject = async (id, updatedData) => {
 };
 
 const deleteProject = async (id) => {
-    const response = await axiosInstance.delete(`/project/${id}`);
+    const response = await axiosInstance.delete(`/project/projects/${id}`);
     return response.data;
 };
 

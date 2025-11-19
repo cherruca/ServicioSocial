@@ -105,3 +105,11 @@ export const deletePetition = async (id) => {
     }
 }
 
+export const unassignProjectFromPetition = async (petitionId, studentId, projectId) => {
+    const petition = await Petition.findById(petitionId);
+    petition.students = petition.students.filter(id => id.toString() !== studentId);
+    petition.projects = petition.projects.filter(id => id.toString() !== projectId);
+    await petition.save();
+    return petition;
+};
+
