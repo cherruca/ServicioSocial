@@ -1,15 +1,24 @@
 import React from 'react';  
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';  
 import { jwtDecode } from 'jwt-decode';  
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Login = () => {  
   const clientId = import.meta.env.VITE_CLIENT_ID;  
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleSuccess = (credencialResponse) => {  
-    console.log('Google Sign In Success', credencialResponse);  
+  const handleSuccess = (credentialResponse) => {  
+    console.log('Google Sign In Success', credentialResponse);  
 
-    const decode = jwtDecode(credencialResponse?.credential);  
+    const decode = jwtDecode(credentialResponse?.credential);  
     console.log(decode);  
+
+    // Store user information in local storage
+    localStorage.setItem('user', JSON.stringify(decode));
+    localStorage.setItem('token', credentialResponse.credential); // Store the token if needed
+
+    // Redirect to UserPage
+    navigate('/user'); // Adjust the path as necessary
   };  
 
   const handleError = () => {  
