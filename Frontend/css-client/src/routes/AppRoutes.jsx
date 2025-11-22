@@ -13,6 +13,7 @@ import Definition from '../pages/Definition/Definition';
 import ServiceOptions from '../pages/ServiceOptions/ServiceOptions';
 import Humanidades from '../pages/Humanidades/Humanidades';
 import Login from '../pages/Login/Login';
+import UserPage from '../pages/UserPage/UserPage';
 import PetitionView from '../pages/petitionView';
 import ListFaculty from '../components/ListFaculty';
 import SocialServiceCenter from '../pages/SocialServiceCenter';
@@ -36,14 +37,15 @@ const AppRoutes = () => {
         <Route path={pages.serviceoptions} element={<ServiceOptions />} />
         <Route path={pages.humanidades} element={<Humanidades />} />
         <Route path={pages.login} element={<Login />} />
+        <Route path={pages.user} element={<UserPage />} />
         <Route path={pages.socialservice}element={<SocialServiceCenter />} />
         <Route path={pages.projectlist} element={<ProjectList />} />
       </Route>
-      <Route path="*" element={<div>404</div>} />
       <Route path={pages.petitionview} element={<PetitionView />} />
       <Route path={pages.listfaculty} element={<ListFaculty />} />
       <Route path={pages.projectmanagement} element={<ProjectManagement />} />
       <Route path={pages.projectform} element={<ProjectForm />} />{' '}
+      <Route path="*" element={<div>404</div>} />
       
       
     </Routes>

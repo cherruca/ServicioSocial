@@ -7,11 +7,11 @@ import { pages } from '../../util/pages';
 
 const Home = () => {
   const images = [
-    '/banner1.jpg',
-    '/banner2.jpg',
-    '/banner3.png',
-    '/banner4.png',
-    '/banner5.png',
+    '/Banner-1.jpg',
+    '/Banner-2.jpg',
+    '/Banner-3.jpg',
+    '/Banner-4.jpg',
+    '/Banner-5.png',
   ];
 
   const { currentIndex, handleNext, handlePrev } = useCarousel(0, images);

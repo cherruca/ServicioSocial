@@ -14,6 +14,42 @@ const Humanidades = () => {
     execute();
   }, [execute]);
 
+  // ---------------------------------------------------------
+  // 🔥 FUNCIÓN PARA ENVIAR LA SOLICITUD (HU 3.1)
+  // ---------------------------------------------------------
+  const postularse = async (projectId) => {
+    // ⚠️ TEMPORAL: este ID se cambia cuando haya login real
+    const studentId = "674e24a34df3e1bc509a5636";
+
+    const body = {
+      estudianteId: studentId,
+      proyectoId: projectId,
+      mensaje: "Estoy interesado en participar"
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/petition/request-assignment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Solicitud enviada correctamente ✔");
+      } else {
+        alert("Error: " + data.message);
+      }
+
+    } catch (error) {
+      alert("Error de red o backend no disponible");
+      console.error(error);
+    }
+  };
+
+  // ---------------------------------------------------------
+
   if (loading) return <p>Cargando proyectos...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -31,8 +67,12 @@ const Humanidades = () => {
               <th className="py-2 px-4 border">Fecha de Finalización</th>
               <th className="py-2 px-4 border">Institución</th>
               <th className="py-2 px-4 border">Encargado</th>
+
+              {/* 🆕 COLUMNA PARA POSTULARSE */}
+              <th className="py-2 px-4 border">Acción</th>
             </tr>
           </thead>
+
           <tbody>
             {projects?.length > 0 ? (
               projects.map((project) => (
@@ -58,6 +98,16 @@ const Humanidades = () => {
                     ) : (
                       <p>No hay administradores asignados.</p>
                     )}
+                  </td>
+
+                  {/* 🆕 BOTÓN POSTULARSE */}
+                  <td className="py-2 px-4 border text-center">
+                    <button
+                      onClick={() => postularse(project._id)}
+                      className="bg-green-600 hover:bg-green-700 text-white font-semibold py-1 px-3 rounded"
+                    >
+                      Postularse
+                    </button>
                   </td>
                 </tr>
               ))
