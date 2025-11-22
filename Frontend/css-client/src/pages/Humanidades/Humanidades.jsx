@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { projectService } from '../../services/projectService';
-import { petitionService } from '../../services/petitionService';
+import axiosInstance from '../../util/axiosInstance';
 
-// ID TEMPORAL — Reemplazar por el ID del estudiante logueado
+// ID TEMPORAL — Cambiar por el ID del estudiante autenticado
 const studentId = "673b76e1c083a1a441927ee0";
 
 const Humanidades = () => {
 
-  // ----- Cargar proyectos -----
+  // ---- Cargar proyectos ----
   const {
     data: projects,
     loading,
@@ -16,45 +16,82 @@ const Humanidades = () => {
     execute: loadProjects,
   } = useApi(projectService.getProjects);
 
-  // ----- Cargar solicitudes (inscripciones) -----
-  const {
-    data: petitions,
-    execute: loadPetitions
-  } = useApi(petitionService.getPetitions);
+  // Estado para guardar si el estudiante está inscrito en cada proyecto
+  const [enrollStatus, setEnrollStatus] = useState({});
 
-  useEffect(() => {
-    loadProjects();
-    loadPetitions();
-  }, []);
-
-  //Inscribirse a un proyecto
-  const handleEnroll = async (projectId) => {
+  // ---- Consultar si está inscrito (endpoint del backend) ----
+  const checkEnrollment = async (projectId) => {
     try {
-      const petitionData = {
-        status: true,
-        students: [studentId],
-        projects: [projectId],
-        administrators: []
-      };
-
-      await petitionService.createPetition(petitionData);
-
-      alert("Te has inscrito correctamente al proyecto.");
-      loadPetitions(); // refrescar inscripciones
-
-    } catch (error) {
-      console.error(error);
-      alert("Error al inscribirte. Verifica los datos o intenta más tarde.");
+      const res = await axiosInstance.get(`/petition/isEnrolled/${studentId}/${projectId}`);
+      return res.data.enrolled;
+    } catch (e) {
+      console.error("Error consultando inscripción:", e);
+      return false;
     }
   };
 
-  //Cancelar inscripción
-  const handleUnenroll = async (petitionId) => {
+  // ---- Cargar estados de inscripción de todos los proyectos ----
+  const loadEnrollments = async (projectList) => {
+    const status = {};
+
+    for (const project of projectList) {
+      const enrolled = await checkEnrollment(project._id);
+      status[project._id] = enrolled;
+    }
+
+    setEnrollStatus(status);
+  };
+
+
+  // ========== USE EFFECTS CORREGIDOS ==========
+
+  // 1. Cargar proyectos solo una vez
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  // 2. Cuando ya existan proyectos, cargar sus estados de inscripción
+  useEffect(() => {
+    if (projects && projects.length > 0) {
+      loadEnrollments(projects);
+    }
+  }, [projects]);
+
+
+  // ========== ACCIONES ==========
+
+  const handleEnroll = async (projectId) => {
     try {
-      await petitionService.deletePetition(petitionId);
+      await axiosInstance.post("/petition/enroll", {
+        studentId,
+        projectId
+      });
+
+      alert("Te has inscrito correctamente al proyecto.");
+
+      // actualizar estado local
+      setEnrollStatus(prev => ({
+        ...prev,
+        [projectId]: true
+      }));
+
+    } catch (error) {
+      console.error(error);
+      alert("Error al inscribirte.");
+    }
+  };
+
+  const handleUnenroll = async (projectId) => {
+    try {
+      await axiosInstance.delete(`/petition/unassign/${studentId}/${projectId}`);
+
       alert("Has cancelado tu inscripción.");
 
-      loadPetitions(); // refrescar lista
+      // actualizar estado local
+      setEnrollStatus(prev => ({
+        ...prev,
+        [projectId]: false
+      }));
 
     } catch (error) {
       console.error(error);
@@ -62,33 +99,26 @@ const Humanidades = () => {
     }
   };
 
-  // Para ver si el estudiante ya está inscrito en un proyecto
-  const getStudentPetitionForProject = (projectId) => {
-    if (!petitions) return null;
 
-    return petitions.find(p =>
-      p.students.includes(studentId) &&
-      p.projects.includes(projectId)
-    ) || null;
-  };
-
-  // RENDER
+  // ========== RENDER ==========
   if (loading) return <p>Cargando proyectos...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (error) return <p>Error cargando datos.</p>;
+
 
   return (
     <div className="flex flex-col p-5">
       <h1 className="text-2xl font-bold mb-5">Listado de Proyectos Activos</h1>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">
-          
+
           <thead>
             <tr className="bg-blue-900 text-white">
               <th className="py-2 px-4 border">Nombre del Proyecto</th>
               <th className="py-2 px-4 border">Descripción</th>
               <th className="py-2 px-4 border">Capacidad</th>
               <th className="py-2 px-4 border">Fecha de Inicio</th>
-              <th className="py-2 px-4 border">Fecha de Finalización</th>
+              <th className="py-2 px-4 border">Fecha Fin</th>
               <th className="py-2 px-4 border">Institución</th>
               <th className="py-2 px-4 border">Encargado</th>
               <th className="py-2 px-4 border">Acciones</th>
@@ -98,8 +128,8 @@ const Humanidades = () => {
           <tbody>
             {projects?.length > 0 ? (
               projects.map((project) => {
-                
-                const petition = getStudentPetitionForProject(project._id);
+
+                const isEnrolled = enrollStatus[project._id];
 
                 return (
                   <tr key={project._id} className="border-b">
@@ -129,15 +159,14 @@ const Humanidades = () => {
                           </div>
                         ))
                       ) : (
-                        <p>No hay administradores asignados.</p>
+                        <p>No hay administradores.</p>
                       )}
                     </td>
 
-                    {/* ====== BOTÓN ACCIÓN ====== */}
                     <td className="py-2 px-4 border text-center">
-                      {petition ? (
+                      {isEnrolled ? (
                         <button
-                          onClick={() => handleUnenroll(petition._id)}
+                          onClick={() => handleUnenroll(project._id)}
                           className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded"
                         >
                           Cancelar inscripción

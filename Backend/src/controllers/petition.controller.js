@@ -3,7 +3,9 @@ import {
     getPetitions,
     findPetitionById,
     deletePetition,
-    assignAdministratorToPetition
+    assignAdministratorToPetition,
+    findPetitionByStudentAndProject,   // <-- FALTA
+    unassignProjectFromPetition        // <-- FALTA
 } from '../services/petition.service.js';
 import {
     findAdministratorById
@@ -13,6 +15,8 @@ import {
 import createError from 'http-errors';
 import {PetitionErrorCodes} from '../utils/errors/petition.errorCodes.js';
 import { AdministratorErrorCodes } from '../utils/errors/administrator.errorCodes.js';
+import { Petition } from '../models/petition.model.js';
+
 
 /* 
     in order to save to an entity, try:
@@ -232,5 +236,21 @@ export const unassignProjectFromPetitionController = async (req, res, next) => {
         next(e);
     }
 };
+
+export const isEnrolledController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.params;
+
+        const petition = await findPetitionByStudentAndProject(studentId, projectId);
+
+        res.status(200).json({
+            enrolled: !!petition
+        });
+
+    } catch (e) {
+        next(e);
+    }
+};
+
 
 

@@ -113,3 +113,33 @@ export const unassignProjectFromPetition = async (petitionId, studentId, project
     return petition;
 };
 
+export const findPetitionByStudentAndProject = async (studentId, projectId) => {
+    try {
+        const petition = await Petition.findOne({
+            students: studentId,
+            projects: projectId
+        });
+
+        return petition;
+    } catch (error) {
+        throw new ServiceError(
+            'Error al buscar la solicitud por estudiante y proyecto',
+            PetitionErrorCodes.PETITION_FETCH_FAILED
+        );
+    }
+};
+
+export const isEnrolledController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.params;
+
+        const petition = await findPetitionByStudentAndProject(studentId, projectId);
+
+        res.status(200).json({
+            enrolled: !!petition
+        });
+
+    } catch (e) {
+        next(e);
+    }
+};

@@ -6,7 +6,9 @@ import {
     assingAdministratorToPetitionController,
     deletePetitionController,
     getPetitionByIdController,
-    enrollProjectController   //IMPORTACIÓN NUEVA
+    enrollProjectController,  //IMPORTACIÓN NUEVA
+    unassignProjectFromPetitionController,
+    isEnrolledController 
 } from '../controllers/petition.controller.js';
 
 const petitionRouter = Router();
@@ -15,7 +17,7 @@ const petitionRouter = Router();
     send the respective data or parameters
 */
 
-petitionRouter.post('/create', createPetitionController);
+//petitionRouter.post('/create', createPetitionController);
 
 petitionRouter.post('/enroll', enrollProjectController);
 petitionRouter.get('/petitions', getPetitionsController);
@@ -23,6 +25,7 @@ petitionRouter.get('/:id', getPetitionByIdController);
 petitionRouter.put('/:petitionId/:administratorId', assingAdministratorToPetitionController);
 petitionRouter.delete('/:id', deletePetitionController);
 petitionRouter.delete('/unassign/:studentId/:projectId', unassignProjectFromPetitionController);
+petitionRouter.get('/isEnrolled/:studentId/:projectId', isEnrolledController);
 
 
 export { petitionRouter };
