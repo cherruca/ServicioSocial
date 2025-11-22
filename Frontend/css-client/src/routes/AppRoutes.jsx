@@ -20,6 +20,7 @@ import SocialServiceCenter from '../pages/SocialServiceCenter';
 import ProjectManagement from '../pages/ProjectManagement';
 import ProjectForm from '../pages/ProjectForm';
 import ProjectList from '../pages/ProjectList';
+import AdminPage from '../pages/AdminPage/AdminPage';
 
 
 const AppRoutes = () => {
@@ -38,6 +39,8 @@ const AppRoutes = () => {
         <Route path={pages.humanidades} element={<Humanidades />} />
         <Route path={pages.login} element={<Login />} />
         <Route path={pages.user} element={<UserPage />} />
+        <Route path={pages.admin} element={<AdminPage />} />
+
         <Route path={pages.socialservice}element={<SocialServiceCenter />} />
         <Route path={pages.projectlist} element={<ProjectList />} />
       </Route>

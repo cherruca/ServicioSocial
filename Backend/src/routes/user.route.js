@@ -10,10 +10,6 @@ import {
 
 const userRouter = Router();
 
-/*
-    handle requests to the controller
-    send the respective data or parameters
-*/
 userRouter.post("/create", createUserController);
 userRouter.get("/users", getUsersController);
 userRouter.get("/get/:id", getUserByIdController);
