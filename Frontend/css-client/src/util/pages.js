@@ -11,6 +11,8 @@ export const pages = {
     definition: '/definicion',
     serviceoptions: '/opcionserviciosocial',
     login: '/login',
+    user: '/user',
+    admin: '/admin',
     humanidades: '/humanidades',
     socialservice: '/social-service',
     projectlist: '/projects-list',
