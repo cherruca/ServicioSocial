@@ -12,9 +12,11 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
   // Función para manejar el cierre de sesión desde el menú
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
     setIsMenuOpen(false);
+    // small delay so user perceives the loading state
+    await new Promise((r) => setTimeout(r, 500));
+    logout();
     navigate(pages.login); // Redirigir al login
   };
 

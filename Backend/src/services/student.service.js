@@ -1,3 +1,17 @@
+/**
+ * Student Service
+ *
+ * Provides persistence and domain operations for Student entities.
+ * Keep business rules here and return domain objects or throw ServiceError.
+ *
+ * Public functions typically used by controllers:
+ * - saveStudent(student)
+ * - getStudents()
+ * - findStudentByEmail(email)
+ * - findStudentById(id)
+ * - assignCareerToStudent(student, careerId)
+ * - deleteStudent(id)
+ */
 import { Student } from "../models/student.model.js";
 import { StudentErrorCodes } from "../utils/errors/student.errorCodes.js";
 import { ServiceError } from "../utils/errors/serviceError.js";
@@ -58,6 +72,18 @@ export const findStudentByName = async (name) => {
   } catch (error) {
     throw new ServiceError(
       "Error al buscar el estudiante",
+      StudentErrorCodes.STUDENT_SEARCH_FAILED
+    );
+  }
+};
+
+export const findStudentByEmail = async (email) => {
+  try {
+    const student = await Student.findOne({ email });
+    return student || null;
+  } catch (error) {
+    throw new ServiceError(
+      "Error al buscar el estudiante por email",
       StudentErrorCodes.STUDENT_SEARCH_FAILED
     );
   }

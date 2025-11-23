@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 
+// create the model with its respective attributes and data types
 const userSchema = new Schema({
   carnet: {
     type: String,
@@ -29,6 +30,7 @@ const userSchema = new Schema({
   ],
 });
 
+// constructor using the model previously created
 const User = model("User", userSchema);
 
 export { User };

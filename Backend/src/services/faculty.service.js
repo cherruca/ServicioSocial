@@ -1,5 +1,17 @@
-import { Faculty } from '../models/faculty.model.js'; 
-import { FacultyErrorCodes } from '../utils/errors/faculty.errorCodes.js'; 
+/**
+ * Faculty Service
+ *
+ * Provides faculty data access and domain rules. Controllers call into
+ * these functions to keep HTTP concerns separate from persistence.
+ *
+ * Public functions:
+ * - saveFaculty(faculty)
+ * - getFaculties()
+ * - findFacultyById(id)
+ * - deleteFaculty(id)
+ */
+import { Faculty } from '../models/faculty.model.js';
+import { FacultyErrorCodes } from '../utils/errors/faculty.errorCodes.js';
 import { ServiceError } from '../utils/errors/serviceError.js';
 
 /* 

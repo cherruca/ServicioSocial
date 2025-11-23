@@ -134,6 +134,8 @@ const UserPage = () => {
           <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">
             Centro de Servicio Social
           </h1>
+
+          
         </div>
 
         {/* --- Tarjetas de información --- */}
