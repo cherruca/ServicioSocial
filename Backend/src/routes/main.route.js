@@ -9,6 +9,7 @@ import { facultyRouter }  from './faculty.route.js';
 import { careerRouter }  from './career.route.js';
 import { petitionRouter }  from './petition.route.js';
 import { userRouter }  from './user.route.js';
+import { authRouter } from './auth.route.js';
 import { Router } from 'express';
 
 const mainRouter = Router();
@@ -23,6 +24,7 @@ mainRouter.use('/faculty', facultyRouter);
 mainRouter.use('/career', careerRouter);
 mainRouter.use('/petition', petitionRouter);
 mainRouter.use('/user', userRouter);
+mainRouter.use('/auth', authRouter);
 
 export { mainRouter };
 

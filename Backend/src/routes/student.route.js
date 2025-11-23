@@ -1,4 +1,5 @@
 import { Router } from "express";
+import attachUserFromGoogleToken, { requireAuth } from "../middleware/auth.middleware.js";
 import {
   createStudentController,
   getStudentsController,
@@ -9,14 +10,18 @@ import {
 
 const studentRouter = Router();
 
-/*
-    handle requests to the controller
-    send the respective data or parameters
-*/
+
 studentRouter.post("/create", createStudentController);
+
 studentRouter.get("/students", getStudentsController);
+
+
 studentRouter.get("/get/:id", getStudentByIdController);
-studentRouter.put("/:studentId/:careerId", assingCareerToStudentController);
-studentRouter.delete("/:id", deleteStudentController);
+
+
+studentRouter.put("/:studentId/:careerId",  assingCareerToStudentController);
+
+
+studentRouter.delete("/:id", attachUserFromGoogleToken, requireAuth, deleteStudentController);
 
 export { studentRouter };

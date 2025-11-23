@@ -1,5 +1,21 @@
-import { Project } from '../models/project.model.js'; 
-import { ProjectErrorCodes } from '../utils/errors/project.errorCodes.js'; 
+/**
+ * Project Service
+ *
+ * Responsible for data access and business rules for Project entities.
+ * Controllers should use these functions instead of directly interacting
+ * with Mongoose models.
+ *
+ * Public functions:
+ * - saveProject(project)
+ * - getProjects()
+ * - findProjectById(id)
+ * - assignAdministratorToProject(project, administratorId)
+ * - deleteProject(id)
+ * - findProjectByName(name)
+ * - getProjectsByStudentId(studentId)
+ */
+import { Project } from '../models/project.model.js';
+import { ProjectErrorCodes } from '../utils/errors/project.errorCodes.js';
 import { ServiceError } from '../utils/errors/serviceError.js';
 
 /* 
@@ -21,6 +37,8 @@ export const saveProject = async (project) => {
         throw new ServiceError('Error al crear el proyecto ', ProjectErrorCodes.PROJECT_CREATION_FAILED);
     }
 }
+
+
 
 /* 
     in order to get all the rows from an entity, try:
@@ -85,6 +103,20 @@ export const findProjectById = async (id) => {
     }
 }
 
+/**
+ * Get projects where a specific student is assigned
+ * @param {string} studentId
+ * @returns {Promise<Array>} list of projects
+ */
+export const getProjectsByStudentId = async (studentId) => {
+    try {
+        const projects = await Project.find({ students: studentId }).populate('administrators').populate('students');
+        return projects;
+    } catch (error) {
+        throw new ServiceError('Error al obtener los proyectos del estudiante', ProjectErrorCodes.PROJECT_FETCH_FAILED);
+    }
+}
+
 // export const deleteAdministratorFromProject = async (administratorId) => {
 //     try {
 //         const updatesProjects = await Project.updateMany({ administrators: administratorId }, { $pull: { administrators: administratorId } });
@@ -113,4 +145,3 @@ export const deleteProject = async (id) => {
         throw new ServiceError('Error al eliminar el proyecto', error.code || ProjectErrorCodes.PROJECT_DELETE_FAILED);
     }
 }
-

@@ -8,12 +8,12 @@ import {
 
 const administratorRouter = Router();
 
-/*
-    handle requests to the controller
-    send the respective data or parameters
-*/
+
 administratorRouter.post('/create', createAdministratorController);
+
+
 administratorRouter.get('/administrators', getAdministratorsController);
+
 // administratorRouter.put('/:administratorId/:administratorId', assingAdministratorToAdministratorController);
 administratorRouter.get('/get/:id', getAdministratorByIdController);
 administratorRouter.delete('/:id', deleteAdministratorController);

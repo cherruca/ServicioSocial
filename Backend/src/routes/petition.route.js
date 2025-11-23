@@ -1,22 +1,40 @@
 import { Router } from 'express';
+import attachUserFromGoogleToken, { requireAuth } from '../middleware/auth.middleware.js';
+
 import {
     createPetitionController,
     getPetitionsController,
     assingAdministratorToPetitionController,
     deletePetitionController,
-    getPetitionByIdController
+    getPetitionByIdController,
+    enrollProjectController,  //IMPORTACIÓN NUEVA
+    unassignProjectFromPetitionController,
+    isEnrolledController 
 } from '../controllers/petition.controller.js';
 
 const petitionRouter = Router();
 
-/*
-    handle requests to the controller
-    send the respective data or parameters
-*/
-petitionRouter.post('/create', createPetitionController);
+
+
+petitionRouter.post('/enroll', enrollProjectController);
+
+
 petitionRouter.get('/petitions', getPetitionsController);
-petitionRouter.get('/get/:id', getPetitionByIdController);
-petitionRouter.put('/:petitionId/:administratorId', assingAdministratorToPetitionController);
+
+
+petitionRouter.get('/:id', getPetitionByIdController);
+
+
+petitionRouter.put('/:petitionId/:administratorId', attachUserFromGoogleToken, requireAuth, assingAdministratorToPetitionController);
+
+
 petitionRouter.delete('/:id', deletePetitionController);
+
+
+petitionRouter.delete('/unassign/:studentId/:projectId', unassignProjectFromPetitionController);
+
+
+petitionRouter.get('/isEnrolled/:studentId/:projectId', attachUserFromGoogleToken, requireAuth, isEnrolledController);
+
 
 export { petitionRouter };
