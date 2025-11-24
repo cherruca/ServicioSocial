@@ -1,3 +1,25 @@
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         carnet:
+ *           type: string
+ *         name:
+ *           type: string
+ *         email:
+ *           type: string
+ *         role:
+ *           type: string
+ *         picture:
+ *           type: string
+ *         careers:
+ *           type: array
+ *           items:
+ *             type: string
+ */
 import { Schema, model } from "mongoose";
 
 // create the model with its respective attributes and data types

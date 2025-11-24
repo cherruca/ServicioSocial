@@ -1,3 +1,19 @@
+/**
+ * Petition Controller
+ *
+ * Manages petition and enrollment flows. Keeps controllers lightweight
+ * by delegating data operations to `petition.service.js` and related services.
+ *
+ * Exported functions:
+ * - createPetitionController
+ * - getPetitionsController
+ * - assingAdministratorToPetitionController
+ * - deletePetitionController
+ * - getPetitionByIdController
+ * - enrollProjectController
+ * - unassignProjectFromPetitionController
+ * - isEnrolledController
+ */
 import {
     savePetition,
     getPetitions,
@@ -49,7 +65,30 @@ export const createPetitionController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /petition/create:
+ *   post:
+ *     tags: [Petition]
+ *     summary: Create a petition
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Petition'
+ *     responses:
+ *       201:
+ *         description: Petition created
+ */
 
+/* 
+    in order to get all the rows from an entity, try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getPetitionsController = async (req, res, next) => {
     try {
         const petitions = await getPetitions();
@@ -65,7 +104,24 @@ export const getPetitionsController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /petition/petitions:
+ *   get:
+ *     tags: [Petition]
+ *     summary: Get all petitions
+ *     responses:
+ *       200:
+ *         description: List of petitions
+ */
 
+/* 
+    get one the rows from an entity by the ID, try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getPetitionByIdController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -83,7 +139,29 @@ export const getPetitionByIdController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /petition/{id}:
+ *   get:
+ *     tags: [Petition]
+ *     summary: Get a petition by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Petition object
+ */
 
+/* 
+    to assign a foreign key to the entity, try:
+        - get the foreign key and search if it's already assigned
+        - if it's not assigned, push it to the array of foreign keys
+        - save the changes and return success status
+    catch:
+        - get error type and print it
+*/
 export const assingAdministratorToPetitionController = async (req, res, next) => {
     try {
         const { petitionId, administratorId } = req.params;
@@ -120,7 +198,35 @@ export const assingAdministratorToPetitionController = async (req, res, next) =>
     }
 }
 
+/**
+ * @openapi
+ * /petition/{petitionId}/{administratorId}:
+ *   put:
+ *     tags: [Petition]
+ *     summary: Assign an administrator to a petition (protected)
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: petitionId
+ *         required: true
+ *       - in: path
+ *         name: administratorId
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Assignment result
+ */
 
+/* 
+    in order to delete an specific row from the entity, try this:
+        - get the row id from the parameter in the request
+        - check if the entity already exists, throw an error if that's the case
+        - use the service functions to delete the row
+        - print success message
+    catch:
+        - get error type and print it
+*/
 export const deletePetitionController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -151,7 +257,27 @@ export const deletePetitionController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /petition/{id}:
+ *   delete:
+ *     tags: [Petition]
+ *     summary: Delete a petition
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Deleted
+ */
 
+/* 
+    controller to enroll a student to a project:
+        - validate data
+        - prevent duplicate enrollments
+        - create a new petition
+*/
 export const enrollProjectController = async (req, res, next) => {
     try {
         const { studentId, projectId } = req.body;
@@ -190,7 +316,27 @@ export const enrollProjectController = async (req, res, next) => {
     }
 };
 
-
+/**
+ * @openapi
+ * /petition/enroll:
+ *   post:
+ *     tags: [Petition]
+ *     summary: Enroll a student to a project (creates a petition)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               studentId:
+ *                 type: string
+ *               projectId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Petition created
+ */
 
 export const unassignProjectFromPetitionController = async (req, res, next) => {
     try {
@@ -207,7 +353,23 @@ export const unassignProjectFromPetitionController = async (req, res, next) => {
     }
 };
 
-
+/**
+ * @openapi
+ * /petition/unassign/{studentId}/{projectId}:
+ *   delete:
+ *     tags: [Petition]
+ *     summary: Unassign a project from a petition
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Unassigned
+ */
 
 export const isEnrolledController = async (req, res, next) => {
     try {
@@ -224,6 +386,23 @@ export const isEnrolledController = async (req, res, next) => {
     }
 };
 
+/**
+ * @openapi
+ * /petition/isEnrolled/{studentId}/{projectId}:
+ *   get:
+ *     tags: [Petition]
+ *     summary: Check if a student is enrolled in a project
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Enrollment status
+ */
 
 
 

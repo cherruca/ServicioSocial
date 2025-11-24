@@ -1,3 +1,18 @@
+/**
+ * User Controller
+ *
+ * Contains controllers that orchestrate requests for User entities.
+ * Each controller delegates persistence to `user.service.js` and
+ * maps service errors to HTTP responses.
+ *
+ * Exported functions:
+ * - createUserController(req, res, next)
+ * - getUsersController(req, res, next)
+ * - getUserByIdController(req, res, next)
+ * - getUserFromToken(req, res, next)
+ * - assingCareerToUserController(req, res, next)
+ * - deleteUserController(req, res, next)
+ */
 import { jwtDecode } from 'jwt-decode'; 
 import {
     saveUser,
@@ -47,7 +62,30 @@ export const createUserController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /user/create:
+ *   post:
+ *     tags: [User]
+ *     summary: Create a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User created
+ */
 
+/* 
+    in order to get all the rows from an entity try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getUsersController = async (req, res, next) => {
     try {
         const users = await getUsers();
@@ -63,7 +101,33 @@ export const getUsersController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /user/users:
+ *   get:
+ *     tags: [User]
+ *     summary: Get all users
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ */
 
+/* 
+    get one the rows from an entity by the ID, try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getUserByIdController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -81,7 +145,31 @@ export const getUserByIdController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /user/get/{id}:
+ *   get:
+ *     tags: [User]
+ *     summary: Get user by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ */
 
+// WHO IM I 
+/*
+    receive a token and decode it to get the email and verify if exists in the database
+*/
 export const getUserFromToken = async (req, res, next) => {
     try {
         const { token } = req.body;
@@ -102,7 +190,25 @@ export const getUserFromToken = async (req, res, next) => {
     }
 }
 
-
+/**
+ * @openapi
+ * /user/signin:
+ *   post:
+ *     tags: [User]
+ *     summary: Sign in a user using token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Signed-in user
+ */
 
 export const assingCareerToUserController = async (req, res, next) => {
     try {
@@ -140,7 +246,37 @@ export const assingCareerToUserController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /user/{userId}/{careerId}:
+ *   put:
+ *     tags: [User]
+ *     summary: Assign a career to a user
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: careerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Assignment result
+ */
 
+/* 
+    in order to delete an specific row from the entity try this:
+        - get the row id from the parameter in the request
+        - check if the entity already exists, throw an error if that's the case
+        - use the service functions to delete the row
+        - print success message
+    catch:
+        - get error type and print it
+*/
 export const deleteUserController = async (req, res, next) => {
     try {
         const { id } = req.params
@@ -171,3 +307,19 @@ export const deleteUserController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /user/{id}:
+ *   delete:
+ *     tags: [User]
+ *     summary: Delete a user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User deleted
+ */

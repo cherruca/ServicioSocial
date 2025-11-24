@@ -1,3 +1,14 @@
+/**
+ * Auth Controller
+ *
+ * Responsible for authentication flows. The `login` controller verifies
+ * a Google ID token (via the `attachUserFromGoogleToken` middleware) and
+ * ensures a persistent identity exists for the application (creates a
+ * Student for UCA emails or a User otherwise).
+ *
+ * Exported functions:
+ * - login(req, res, next)
+ */
 import { attachUserFromGoogleToken } from '../middleware/auth.middleware.js';
 import { findUserByEmail, saveUser } from '../services/user.service.js';
 import { findStudentByEmail, saveStudent } from '../services/student.service.js';
@@ -95,5 +106,32 @@ export const login = async (req, res, next) => {
     return next(error);
   }
 };
+
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Verify Google ID token and create or return application identity
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Authentication result
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ */
 
 export default { login };
