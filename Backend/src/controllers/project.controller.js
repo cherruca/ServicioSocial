@@ -4,7 +4,8 @@ import {
     findProjectById,
     assignAdministratorToProject,
     deleteProject,
-    findProjectByName
+    findProjectByName,
+    getProjectsByStudentId
 } from '../services/project.service.js';
 import {
     findAdministratorById
@@ -15,6 +16,7 @@ import createError from 'http-errors';
 import {ProjectErrorCodes} from '../utils/errors/project.errorCodes.js';
 import { AdministratorErrorCodes } from '../utils/errors/administrator.errorCodes.js';
 
+
 /* 
     in order to save to an entity try:
         - store the request body and use the service functions for the process
@@ -23,17 +25,16 @@ import { AdministratorErrorCodes } from '../utils/errors/administrator.errorCode
     catch:
         - get error type and print it
 */
-export const createProjectController = async (req, res, next) => {
+const createProjectController = async (req, res, next) => {
     try {
         const project = req.body;
-        const existProject= await findProjectByName(project.name);
-        if(existProject) throw createError(400, 'El proyecto ya existe');
+        const existProject = await findProjectByName(project.name);
+        if (existProject) throw createError(400, 'El proyecto ya existe');
 
         const projectCreated = await saveProject(project);
         res.status(201).json({ message: 'project created', data: projectCreated });
     } catch (e) {
-        switch(e.code)
-        {
+        switch (e.code) {
             case ProjectErrorCodes.PROJECT_NOT_FOUND:
                 next(createError(404, 'El proyecto no existe'));
                 break;
@@ -44,7 +45,7 @@ export const createProjectController = async (req, res, next) => {
                 next(e);
         }
     }
-}
+};
 
 /* 
     in order to get all the rows from an entity try:
@@ -53,12 +54,12 @@ export const createProjectController = async (req, res, next) => {
     catch:
         - get error type and print it
 */
-export const getProjectsController = async (req, res, next) => {
+const getProjectsController = async (req, res, next) => {
     try {
         const projects = await getProjects();
         res.status(200).json({ data: projects });
     } catch (e) {
-        switch(e.code){
+        switch (e.code) {
             case ProjectErrorCodes.PROJECT_FETCH_FAILED:
                 next(createError(500, 'Error al obtener los proyectos'));
                 break;
@@ -66,7 +67,7 @@ export const getProjectsController = async (req, res, next) => {
                 next(e);
         }
     }
-}
+};
 
 /* 
     get one the rows from an entity by the ID, try:
@@ -75,14 +76,14 @@ export const getProjectsController = async (req, res, next) => {
     catch:
         - get error type and print it
 */
-export const getProjectByIdController = async (req, res, next) => {
+const getProjectByIdController = async (req, res, next) => {
     try {
         const { id } = req.params;
 
         const thisProject = await findProjectById(id);
         res.status(200).json({ data: thisProject });
     } catch (e) {
-        switch(e.code){
+        switch (e.code) {
             case ProjectErrorCodes.PROJECT_FETCH_FAILED:
                 next(createError(500, 'Error al obtener el proyecto por su ID'));
                 break;
@@ -90,9 +91,25 @@ export const getProjectByIdController = async (req, res, next) => {
                 next(e);
         }
     }
-}
+};
 
-export const assingAdministratorToProjectController = async (req, res, next) => {
+const getProjectsByStudentIdController = async (req, res, next) => {
+    try {
+        const { studentId } = req.params;
+        const projects = await getProjectsByStudentId(studentId);
+        res.status(200).json({ data: projects });
+    } catch (e) {
+        switch (e.code) {
+            case ProjectErrorCodes.PROJECT_FETCH_FAILED:
+                next(createError(500, 'Error al obtener los proyectos del estudiante'));
+                break;
+            default:
+                next(e);
+        }
+    }
+};
+
+const assingAdministratorToProjectController = async (req, res, next) => {
     try {
         const { administratorId, projectId } = req.params;
 
@@ -126,7 +143,7 @@ export const assingAdministratorToProjectController = async (req, res, next) => 
                 next(e);
         }
     }
-}
+};
 
 /* 
     in order to delete an specific row from the entity try this:
@@ -137,7 +154,7 @@ export const assingAdministratorToProjectController = async (req, res, next) => 
     catch:
         - get error type and print it
 */
-export const deleteProjectController = async (req, res, next) => {
+const deleteProjectController = async (req, res, next) => {
     try {
         const { id } = req.params
 
@@ -148,7 +165,7 @@ export const deleteProjectController = async (req, res, next) => {
         await deleteProject(id);
         res.status(200).json({ message: 'Proyecto eliminado' })
     } catch (e) {
-        switch(e.code){
+        switch (e.code) {
             case ProjectErrorCodes.PROJECT_NOT_FOUND:
                 next(createError(404, 'El proyecto no existe'));
                 break;
@@ -165,4 +182,15 @@ export const deleteProjectController = async (req, res, next) => {
                 next(e);
         }
     }
-}
+};
+
+export {
+    createProjectController,
+    getProjectsController,
+    getProjectByIdController,
+    getProjectsByStudentIdController,
+    assingAdministratorToProjectController,
+    deleteProjectController
+};
+
+

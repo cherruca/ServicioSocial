@@ -1,16 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../util/axiosInstance';
+import { useAuth } from '../../states/AuthContext';
 
 const UserPage = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);     // datos del token de Google
+  const { logout, login } = useAuth();
+
+  const [user, setUser] = useState(null); // datos del token de Google
   const [dbUser, setDbUser] = useState(null); // datos reales desde Mongo
 
-  // Bandera para evitar llamar /user/signin dos veces en modo StrictMode
   const hasFetchedRef = useRef(false);
 
-  // Leer el usuario guardado por el login de Google y verificar/crear en la BD
+  // Leer el usuario guardado por el login de Google y verificar
   useEffect(() => {
     const storedUser =
       typeof window !== 'undefined' ? localStorage.getItem('user') : null;
@@ -25,6 +27,8 @@ const UserPage = () => {
     try {
       const parsed = JSON.parse(storedUser);
       setUser(parsed);
+
+      login(parsed);
 
       if (hasFetchedRef.current) return;
       hasFetchedRef.current = true;
@@ -57,19 +61,15 @@ const UserPage = () => {
         });
     } catch (e) {
       console.error('Error al leer user de localStorage', e);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      localStorage.removeItem('dbUser');
+      // ... (limpieza de localStorage en caso de error)
+      logout();
       navigate('/login', { replace: true });
     }
-  }, [navigate]);
+    // Añadimos 'login' como dependencia para evitar warnings
+  }, [navigate, login]);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('dbUser');
+    logout();
     setUser(null);
     setDbUser(null);
     navigate('/login', { replace: true });
@@ -87,87 +87,98 @@ const UserPage = () => {
   const studentName =
     dbUser?.name || user.name || user.given_name || 'Estudiante';
 
-  const studentId =
-    dbUser?.carnet || user.email?.split('@')[0] || '00000000';
+  const studentId = dbUser?.carnet || user.email?.split('@')[0] || '00000000';
 
   const career = 'Ingeniería Informática';
 
-  const totalHours = 600;                 // horas totales
+  const totalHours = 600; // horas totales
   const completedHours = dbUser?.hours ?? 0; // horas desde Mongo (0 por defecto)
+
+  // Determinar la URL de la imagen (usando 'picture' confirmado en tu JSON)
+  const profilePicture = user.picture;
 
   return (
     <div className="flex min-h-[calc(100vh-120px)]">
-      <aside className="w-1/4 bg-blue-200 p-5 flex flex-col justify-center">
-        <h2 className="text-lg font-semibold mb-4 text-center">
+      <aside className="w-1/4 bg-blue-200 p-5 flex flex-col items-center text-center justify-center">
+        {profilePicture && (
+          <>
+            <img
+              src={profilePicture}
+              alt="Foto de perfil"
+              className="w-24 h-24 rounded-full mb-4 border-4 border-white shadow-lg object-cover"
+            />
+            <p className="font-semibold mb-6 w-full">Foto de perfil</p>
+          </>
+        )}
+
+        {/* Información del Estudiante */}
+        <h2 className="text-lg font-semibold mb-4 w-full">
           Información del Estudiante
         </h2>
-        <p className="text-center mb-2">
-          <span className="font-semibold">Estudiante:</span> {studentName}
+        <p className="mb-2 w-full">
+          <span className="font-semibold block">Estudiante:</span> {studentName}
         </p>
-        <p className="text-center mb-2">
-          <span className="font-semibold">Carnet:</span> {studentId}
+        <p className="mb-2 w-full">
+          <span className="font-semibold block">Carnet:</span> {studentId}
         </p>
-        <p className="text-center mb-2">
-          <span className="font-semibold">Correo:</span> {user.email}
+        <p className="mb-2 w-full">
+          <span className="font-semibold block">Correo:</span> {user.email}
         </p>
-        <p className="text-center">
-          <span className="font-semibold">Carrera:</span> {career}
+        <p className="w-full">
+          <span className="font-semibold block">Carrera:</span> {career}
         </p>
       </aside>
 
-      {/* Contenido principal */}
-      <main className="flex-1 p-5 bg-gray-50 flex flex-col items-center justify-center">
-        {/* Título + botón de logout */}
-        <div className="w-full flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Centro de Servicio Social</h1>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
-          >
-            Cerrar sesión
-          </button>
+      <main className="flex-1 p-5 bg-gray-50 flex flex-col items-center">
+        <div className="w-full flex justify-between items-center mb-6 relative">
+          <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">
+            Centro de Servicio Social
+          </h1>
+
+          
         </div>
 
-        {/* Tarjeta: Mis horas sociales */}
-        <div className="bg-blue-200 p-6 rounded-lg shadow-md mb-6 w-full max-w-2xl transition-transform transform hover:scale-105 hover:shadow-xl">
-          <h2 className="text-lg font-semibold text-center mb-4">
-            Mis horas sociales
-          </h2>
-          <div className="flex items-center justify-center">
-            <div className="relative w-full h-4 bg-gray-300 rounded-full">
-              <div
-                className="absolute h-full bg-blue-600 rounded-full"
-                style={{ width: `${(completedHours / totalHours) * 100}%` }}
-              ></div>
+        {/* --- Tarjetas de información --- */}
+        <div className="w-full max-w-2xl mt-12">
+          {/* Tarjeta: Mis horas sociales */}
+          <div className="bg-blue-200 p-6 rounded-lg shadow-md mb-6 w-full transition-transform transform hover:scale-[1.02] hover:shadow-xl">
+            <h2 className="text-lg font-semibold text-center mb-4">
+              Mis horas sociales
+            </h2>
+            <div className="flex items-center justify-center">
+              <div className="relative w-full h-4 bg-gray-300 rounded-full">
+                <div
+                  className="absolute h-full bg-blue-600 rounded-full"
+                  style={{ width: `${(completedHours / totalHours) * 100}%` }}
+                ></div>
+              </div>
+              <span className="ml-2">
+                {completedHours} / {totalHours} horas
+              </span>
             </div>
-            <span className="ml-2">
-              {completedHours} / {totalHours} horas
-            </span>
           </div>
-        </div>
 
-        {/* Tarjeta: Servicios sociales activos (quemado) */}
-        <div className="bg-blue-200 p-6 rounded-lg shadow-md mb-6 w-full max-w-2xl transition-transform transform hover:scale-105 hover:shadow-xl">
-          <h2 className="text-lg font-semibold text-center mb-4">
-            Servicios sociales activos
-          </h2>
-          <ul className="list-disc list-inside">
-            <li>Apoyo en laboratorio de cómputo</li>
-            <li>Tutorías de programación básica</li>
-            <li>Soporte técnico a la comunidad UCA</li>
-          </ul>
-        </div>
+          <div className="bg-blue-200 p-6 rounded-lg shadow-md mb-6 w-full transition-transform transform hover:scale-[1.02] hover:shadow-xl">
+            <h2 className="text-lg font-semibold text-center mb-4">
+              Servicios sociales activos
+            </h2>
+            <ul className="list-disc list-inside">
+              <li>Apoyo en laboratorio de cómputo</li>
+              <li>Tutorías de programación básica</li>
+              <li>Soporte técnico a la comunidad UCA</li>
+            </ul>
+          </div>
 
-        {/* Tarjeta: Listado de proyectos (también quemado) */}
-        <div className="bg-blue-200 p-6 rounded-lg shadow-md w-full max-w-2xl transition-transform transform hover:scale-105 hover:shadow-xl">
-          <h2 className="text-lg font-semibold text-center mb-4">
-            Listado de proyectos de servicios sociales
-          </h2>
-          <ul className="list-disc list-inside">
-            <li>Proyecto 1: Plataforma de gestión de servicio social</li>
-            <li>Proyecto 2: Soporte a laboratorios de la FIA</li>
-            <li>Proyecto 3: Acompañamiento a estudiantes de nuevo ingreso</li>
-          </ul>
+          <div className="bg-blue-200 p-6 rounded-lg shadow-md w-full transition-transform transform hover:scale-[1.02] hover:shadow-xl">
+            <h2 className="text-lg font-semibold text-center mb-4">
+              Listado de proyectos de servicios sociales
+            </h2>
+            <ul className="list-disc list-inside">
+              <li>Proyecto 1: Plataforma de gestión de servicio social</li>
+              <li>Proyecto 2: Soporte a laboratorios de la FIA</li>
+              <li>Proyecto 3: Acompañamiento a estudiantes de nuevo ingreso</li>
+            </ul>
+          </div>
         </div>
       </main>
     </div>

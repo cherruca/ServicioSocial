@@ -1,3 +1,17 @@
+/**
+ * User Service
+ *
+ * Encapsulates all persistence and domain logic for `User` entities.
+ * Controllers should call these functions and handle HTTP concerns.
+ *
+ * Public functions:
+ * - saveUser(user)
+ * - getUsers()
+ * - findUserByEmail(email)
+ * - assignCareerToUser(user, careerId)
+ * - findUserById(id)
+ * - deleteUser(id)
+ */
 import { User } from "../models/user.model.js";
 import { UserErrorCodes } from "../utils/errors/user.errorCodes.js";
 import { ServiceError } from "../utils/errors/serviceError.js";
@@ -11,12 +25,14 @@ import { ServiceError } from "../utils/errors/serviceError.js";
         - get error type and print it
 */
 export const saveUser = async (user) => {
+  console.log('[user.service] saveUser called with:', user);
   const newUser = new User(user);
   try {
     const userCreated = await newUser.save();
+    console.log('[user.service] saveUser succeeded id=', userCreated._id);
     return userCreated;
   } catch (error) {
-    console.log(error);
+    console.error('[user.service] saveUser error:', error && error.stack ? error.stack : error);
     throw new ServiceError(
       "Error al crear el usuario ",
       UserErrorCodes.USER_CREATION_FAILED

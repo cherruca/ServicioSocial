@@ -1,5 +1,21 @@
-import { Petition } from '../models/petition.model.js'; 
-import { PetitionErrorCodes } from '../utils/errors/petition.errorCodes.js'; 
+/**
+ * Petition Service
+ *
+ * Implements persistence and domain operations for petitions and
+ * enrollment actions. Returns domain objects or throws ServiceError
+ * with standardized error codes.
+ *
+ * Public functions:
+ * - savePetition(petition)
+ * - getPetitions()
+ * - findPetitionById(id)
+ * - deletePetition(id)
+ * - assignAdministratorToPetition(petition, administratorId)
+ * - enrollProjectToPetition(studentId, projectId)
+ * - unassignProjectFromPetition(studentId, projectId)
+ */
+import { Petition } from '../models/petition.model.js';
+import { PetitionErrorCodes } from '../utils/errors/petition.errorCodes.js';
 import { ServiceError } from '../utils/errors/serviceError.js';
 
 /* 
@@ -105,3 +121,41 @@ export const deletePetition = async (id) => {
     }
 }
 
+export const unassignProjectFromPetition = async (petitionId, studentId, projectId) => {
+    const petition = await Petition.findById(petitionId);
+    petition.students = petition.students.filter(id => id.toString() !== studentId);
+    petition.projects = petition.projects.filter(id => id.toString() !== projectId);
+    await petition.save();
+    return petition;
+};
+
+export const findPetitionByStudentAndProject = async (studentId, projectId) => {
+    try {
+        const petition = await Petition.findOne({
+            students: studentId,
+            projects: projectId
+        });
+
+        return petition;
+    } catch (error) {
+        throw new ServiceError(
+            'Error al buscar la solicitud por estudiante y proyecto',
+            PetitionErrorCodes.PETITION_FETCH_FAILED
+        );
+    }
+};
+
+export const isEnrolledController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.params;
+
+        const petition = await findPetitionByStudentAndProject(studentId, projectId);
+
+        res.status(200).json({
+            enrolled: !!petition
+        });
+
+    } catch (e) {
+        next(e);
+    }
+};

@@ -1,21 +1,84 @@
 import React from 'react';  
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';  
-import { jwtDecode } from 'jwt-decode';  
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import axios from '../../util/axiosInstance';
+import { useAuth } from '../../states/AuthContext';
 
 const Login = () => {  
   const clientId = import.meta.env.VITE_CLIENT_ID;  
   const navigate = useNavigate(); 
+  const { setLoading } = useAuth();
 
-  const handleSuccess = (credentialResponse) => {  
+  const handleSuccess = async (credentialResponse) => {  
     console.log('Google Sign In Success', credentialResponse);  
 
-    const decode = jwtDecode(credentialResponse?.credential);  
-    console.log(decode);  
+    const token = credentialResponse?.credential;
+    if (!token) {
+      console.error('[login] no credential token in Google response');
+      return;
+    }
 
-    localStorage.setItem('user', JSON.stringify(decode));
-    localStorage.setItem('token', credentialResponse.credential); 
-    navigate('/user'); 
+    // Try to dynamically import jwt-decode to handle bundler interop
+    let decode = null;
+    try {
+      const jwtModule = await import('jwt-decode');
+      const decodeFn = jwtModule && (jwtModule.default ?? jwtModule);
+      if (typeof decodeFn === 'function') {
+        decode = decodeFn(token);
+      } else {
+        console.warn('[login] jwt-decode decode function not found, skipping local decode');
+      }
+    } catch (e) {
+      console.warn('[login] dynamic import of jwt-decode failed, skipping local decode', e);
+    }
+    console.log('decoded:', decode);
+
+    // Build JSON payload. Send property 'token' because backend middleware looks for req.body.token.
+    const payload = { token, decoded: decode };
+
+    try {
+      
+      console.log('[login] sending /auth/login payload:', { tokenShort: `${token.slice(0,10)}...` });
+      const res = await axios.post('/auth/login', payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log('Backend /auth/login response:', res.status, res.data);
+      // Store the decoded Google payload in localStorage as `user` so existing UI works.
+      // If decoding failed (decode is null), synthesize a compatible object from backend response.
+      let userToStore = null;
+      if (decode) {
+        userToStore = decode;
+      } else if (res.data && res.data.user) {
+        // Build a minimal user object compatible with components: { name, email, picture }
+        const db = res.data.user;
+        userToStore = {
+          name: db.name || db.email || 'Estudiante',
+          email: db.email || '',
+          picture: db.picture || db.avatar || '',
+        };
+      } else {
+        userToStore = { email: '' };
+      }
+      localStorage.setItem('user', JSON.stringify(userToStore));
+      localStorage.setItem('token', token);
+      
+      navigate('/user');
+    } catch (err) {
+      console.error('Backend verification failed - full error:', err);
+      if (err?.response) {
+        console.error('Response status:', err.response.status);
+        console.error('Response data:', err.response.data);
+      }
+      // fallback: store the decoded token locally so app still has user info
+      if (decode) {
+        localStorage.setItem('user', JSON.stringify(decode));
+        localStorage.setItem('token', token);
+        setLoading(false);
+        navigate('/user');
+      }
+      // ensure loading is cleared even if decode isn't available
+      setLoading(false);
+    }
   };  
 
   const handleError = () => {  

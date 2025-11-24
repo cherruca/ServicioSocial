@@ -3,7 +3,9 @@ import {
     getPetitions,
     findPetitionById,
     deletePetition,
-    assignAdministratorToPetition
+    assignAdministratorToPetition,
+    findPetitionByStudentAndProject,   // <-- FALTA
+    unassignProjectFromPetition        // <-- FALTA
 } from '../services/petition.service.js';
 import {
     findAdministratorById
@@ -13,6 +15,8 @@ import {
 import createError from 'http-errors';
 import {PetitionErrorCodes} from '../utils/errors/petition.errorCodes.js';
 import { AdministratorErrorCodes } from '../utils/errors/administrator.errorCodes.js';
+import { Petition } from '../models/petition.model.js';
+
 
 /* 
     in order to save to an entity, try:
@@ -45,13 +49,7 @@ export const createPetitionController = async (req, res, next) => {
     }
 }
 
-/* 
-    in order to get all the rows from an entity, try:
-        - use the service functions to get all the rows and store it in a variable
-        - return it in JSON format
-    catch:
-        - get error type and print it
-*/
+
 export const getPetitionsController = async (req, res, next) => {
     try {
         const petitions = await getPetitions();
@@ -67,13 +65,7 @@ export const getPetitionsController = async (req, res, next) => {
     }
 }
 
-/* 
-    get one the rows from an entity by the ID, try:
-        - use the service functions to get all the rows and store it in a variable
-        - return it in JSON format
-    catch:
-        - get error type and print it
-*/
+
 export const getPetitionByIdController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -91,14 +83,7 @@ export const getPetitionByIdController = async (req, res, next) => {
     }
 }
 
-/* 
-    to assign a foreign key to the entity, try:
-        - get the foreign key and search if it's already assigned
-        - if it's not assigned, push it to the array of foreign keys
-        - save the changes and return success status
-    catch:
-        - get error type and print it
-*/
+
 export const assingAdministratorToPetitionController = async (req, res, next) => {
     try {
         const { petitionId, administratorId } = req.params;
@@ -135,15 +120,7 @@ export const assingAdministratorToPetitionController = async (req, res, next) =>
     }
 }
 
-/* 
-    in order to delete an specific row from the entity, try this:
-        - get the row id from the parameter in the request
-        - check if the entity already exists, throw an error if that's the case
-        - use the service functions to delete the row
-        - print success message
-    catch:
-        - get error type and print it
-*/
+
 export const deletePetitionController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -173,3 +150,80 @@ export const deletePetitionController = async (req, res, next) => {
         }
     }
 }
+
+
+export const enrollProjectController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.body;
+
+        if (!studentId || !projectId) {
+            return next(createError(400, "Datos incompletos"));
+        }
+
+        // verificar si ya existe una solicitud igual
+        const existing = await Petition.findOne({
+            students: studentId,
+            projects: projectId
+        });
+
+        if (existing) {
+            return next(createError(400, "Ya enviaste una solicitud para este proyecto"));
+        }
+
+        const petitionData = {
+            date: Date.now(),
+            status: false, // pendiente
+            students: [studentId],
+            projects: [projectId],
+            administrators: []
+        };
+
+        const created = await savePetition(petitionData);
+
+        res.status(201).json({
+            message: "Solicitud enviada correctamente",
+            data: created
+        });
+
+    } catch (e) {
+        next(createError(500, "Error al inscribirse al proyecto"));
+    }
+};
+
+
+
+export const unassignProjectFromPetitionController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.params;
+
+        const petition = await findPetitionByStudentAndProject(studentId, projectId);
+        if (!petition) throw createError(404, "La inscripción no existe");
+
+        await unassignProjectFromPetition(petition._id, studentId, projectId);
+
+        res.status(200).json({ message: "Inscripción eliminada correctamente" });
+    } catch (e) {
+        next(e);
+    }
+};
+
+
+
+export const isEnrolledController = async (req, res, next) => {
+    try {
+        const { studentId, projectId } = req.params;
+
+        const petition = await findPetitionByStudentAndProject(studentId, projectId);
+
+        res.status(200).json({
+            enrolled: !!petition
+        });
+
+    } catch (e) {
+        next(e);
+    }
+};
+
+
+
+

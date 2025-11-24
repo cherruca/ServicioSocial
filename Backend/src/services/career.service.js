@@ -1,5 +1,17 @@
-import { Career } from '../models/career.model.js'; 
-import { CareerErrorCodes } from '../utils/errors/career.errorCodes.js'; 
+/**
+ * Career Service
+ *
+ * Encapsulates data operations for Career entities.
+ *
+ * Public functions:
+ * - saveCareer(career)
+ * - getCareers()
+ * - findCareerById(id)
+ * - assingFacultyToCareer(career, facultyId)
+ * - deleteCareer(id)
+ */
+import { Career } from '../models/career.model.js';
+import { CareerErrorCodes } from '../utils/errors/career.errorCodes.js';
 import { ServiceError } from '../utils/errors/serviceError.js';
 
 /* 

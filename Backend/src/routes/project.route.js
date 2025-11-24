@@ -1,22 +1,32 @@
 import { Router } from 'express';
+import attachUserFromGoogleToken, { requireAuth } from '../middleware/auth.middleware.js';
 import {
     createProjectController,
     getProjectsController,
     assingAdministratorToProjectController,
     deleteProjectController,
-    getProjectByIdController
+    getProjectByIdController,
+    getProjectsByStudentIdController
 } from '../controllers/project.controller.js';
 
 const projectRouter = Router();
 
-/*
-    handle requests to the controller
-    send the respective data or parameters
-*/
-projectRouter.post('/create', createProjectController);
+
+projectRouter.post('/create', attachUserFromGoogleToken, requireAuth, createProjectController);
+
+
 projectRouter.get('/projects', getProjectsController);
+
+
 projectRouter.get('/get/:id', getProjectByIdController);
-projectRouter.put('/:projectId/:administratorId', assingAdministratorToProjectController);
-projectRouter.delete('/:id', deleteProjectController);
+
+
+projectRouter.put('/:projectId/:administratorId', attachUserFromGoogleToken, requireAuth, assingAdministratorToProjectController);
+
+
+projectRouter.delete('/:id', attachUserFromGoogleToken, requireAuth, deleteProjectController);
+
+
+projectRouter.get('/student/:studentId', attachUserFromGoogleToken, requireAuth, getProjectsByStudentIdController);
 
 export { projectRouter };

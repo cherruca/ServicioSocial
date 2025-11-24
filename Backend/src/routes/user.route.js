@@ -10,11 +10,22 @@ import {
 
 const userRouter = Router();
 
+
 userRouter.post("/create", createUserController);
+
+
 userRouter.get("/users", getUsersController);
+
+
 userRouter.get("/get/:id", getUserByIdController);
+
+
 userRouter.put("/:userId/:careerId", assingCareerToUserController);
+
+
 userRouter.delete("/:id", deleteUserController);
+
+
 userRouter.post("/signin", getUserFromToken);
 
 export { userRouter };
