@@ -10,6 +10,7 @@
 
 1. Backend: API built using Node.js that connects to an Atlas MongoDB.
 2. Frontend: Designed with Vite React.
+3. Testing: Read the [testing plan](TESTING_PLAN.md) for more info.
 
 ### Backend Dependencies
 
