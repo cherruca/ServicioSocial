@@ -1,5 +1,11 @@
-import { Administrator } from '../models/administrator.model.js'; 
-import { AdministratorErrorCodes } from '../utils/errors/administrator.errorCodes.js'; 
+/**
+ * Administrator Service
+ *
+ * Manages persistence and domain logic for Administrator entities.
+ * Keep business rules here and return domain objects or throw ServiceError.
+ */
+import { Administrator } from '../models/administrator.model.js';
+import { AdministratorErrorCodes } from '../utils/errors/administrator.errorCodes.js';
 import { ServiceError } from '../utils/errors/serviceError.js';
 
 /* 
