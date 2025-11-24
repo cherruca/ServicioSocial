@@ -8,10 +8,24 @@ import {
 
 const administratorRouter = Router();
 
-
+/**
+ * @openapi
+ * tags:
+ *   - name: Administrator
+ *     description: Administrator management
+ */
 administratorRouter.post('/create', createAdministratorController);
 
-
+/**
+ * @openapi
+ * /administrator/administrators:
+ *   get:
+ *     tags: [Administrator]
+ *     summary: List administrators
+ *     responses:
+ *       200:
+ *         description: List
+ */
 administratorRouter.get('/administrators', getAdministratorsController);
 
 // administratorRouter.put('/:administratorId/:administratorId', assingAdministratorToAdministratorController);

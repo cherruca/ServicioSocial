@@ -1,3 +1,19 @@
+/**
+ * Student Controller
+ *
+ * Handles HTTP requests related to Students. Controllers are thin
+ * orchestration layers that validate inputs (if present), call
+ * service functions in `student.service.js`, and map errors to HTTP
+ * responses.
+ *
+ * Exported functions:
+ * - createStudentController
+ * - getStudentsController
+ * - assingCareerToStudentController
+ * - deleteStudentController
+ * - getStudentByIdController
+ */
+
 import {
     saveStudent,
     getStudents,
@@ -46,7 +62,30 @@ export const createStudentController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /student/create:
+ *   post:
+ *     tags: [Student]
+ *     summary: Create a new student
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Student'
+ *     responses:
+ *       201:
+ *         description: Student created
+ */
 
+/* 
+    in order to get all the rows from an entity try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getStudentsController = async (req, res, next) => {
     try {
         const students = await getStudents();
@@ -62,7 +101,33 @@ export const getStudentsController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /student/students:
+ *   get:
+ *     tags: [Student]
+ *     summary: Get all students
+ *     responses:
+ *       200:
+ *         description: List of students
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Student'
+ */
 
+/* 
+    get one the rows from an entity by the ID, try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getStudentByIdController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -80,6 +145,22 @@ export const getStudentByIdController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /student/get/{id}:
+ *   get:
+ *     tags: [Student]
+ *     summary: Get a student by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Student object
+ */
 
 export const assingCareerToStudentController = async (req, res, next) => {
     try {
@@ -117,7 +198,37 @@ export const assingCareerToStudentController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /student/{studentId}/{careerId}:
+ *   put:
+ *     tags: [Student]
+ *     summary: Assign a career to a student
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: careerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Assignment result
+ */
 
+/* 
+    in order to delete an specific row from the entity try this:
+        - get the row id from the parameter in the request
+        - check if the entity already exists, throw an error if that's the case
+        - use the service functions to delete the row
+        - print success message
+    catch:
+        - get error type and print it
+*/
 export const deleteStudentController = async (req, res, next) => {
     try {
         const { id } = req.params
@@ -148,3 +259,19 @@ export const deleteStudentController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /student/{id}:
+ *   delete:
+ *     tags: [Student]
+ *     summary: Delete a student by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Deleted
+ */

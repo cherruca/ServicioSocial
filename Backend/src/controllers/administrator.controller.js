@@ -1,3 +1,15 @@
+/**
+ * Administrator Controller
+ *
+ * Manages administrator CRUD operations. Delegates persistence to
+ * `administrator.service.js` and maps errors to HTTP responses.
+ *
+ * Exported functions:
+ * - createAdministratorController
+ * - getAdministratorsController
+ * - deleteAdministratorController
+ * - getAdministratorByIdController
+ */
 import {
     saveAdministrator,
     getAdministrators,
@@ -40,7 +52,37 @@ export const createAdministratorController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /administrator/create:
+ *   post:
+ *     tags: [Administrator]
+ *     summary: Create an administrator
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               carnet:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Administrator created
+ */
 
+/* 
+    in order to get all the rows from an entity, try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getAdministratorsController = async (req, res, next) => {
     try {
         const administrators = await getAdministrators();
@@ -56,7 +98,24 @@ export const getAdministratorsController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /administrator/administrators:
+ *   get:
+ *     tags: [Administrator]
+ *     summary: Get all administrators
+ *     responses:
+ *       200:
+ *         description: List of administrators
+ */
 
+/* 
+    get one the rows from an entity by the ID, try:
+        - use the service functions to get all the rows and store it in a variable
+        - return it in JSON format
+    catch:
+        - get error type and print it
+*/
 export const getAdministratorByIdController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -74,7 +133,30 @@ export const getAdministratorByIdController = async (req, res, next) => {
     }
 }
 
+/**
+ * @openapi
+ * /administrator/get/{id}:
+ *   get:
+ *     tags: [Administrator]
+ *     summary: Get an administrator by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Administrator object
+ */
 
+/* 
+    in order to delete an specific row from the entity, try this:
+        - get the row id from the parameter in the request
+        - check if the entity already exists, throw an error if that's the case
+        - use the service functions to delete the row
+        - print success message
+    catch:
+        - get error type and print it
+*/
 export const deleteAdministratorController = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -104,3 +186,18 @@ export const deleteAdministratorController = async (req, res, next) => {
         }
     }
 }
+
+/**
+ * @openapi
+ * /administrator/{id}:
+ *   delete:
+ *     tags: [Administrator]
+ *     summary: Delete an administrator
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Deleted
+ */

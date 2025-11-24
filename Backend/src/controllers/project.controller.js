@@ -1,3 +1,18 @@
+/**
+ * Project Controller
+ *
+ * Orchestrates project-related actions. Controllers call `project.service.js`
+ * to perform persistence and domain operations and translate service
+ * level errors into HTTP responses.
+ *
+ * Exported functions:
+ * - createProjectController
+ * - getProjectsController
+ * - getProjectByIdController
+ * - getProjectsByStudentIdController
+ * - assingAdministratorToProjectController
+ * - deleteProjectController
+ */
 import {
     saveProject,
     getProjects,
@@ -193,4 +208,105 @@ export {
     deleteProjectController
 };
 
+/**
+ * @openapi
+ * /project/create:
+ *   post:
+ *     tags: [Project]
+ *     summary: Create a new project
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Project'
+ *     responses:
+ *       201:
+ *         description: Project created
+ */
 
+/**
+ * @openapi
+ * /project/projects:
+ *   get:
+ *     tags: [Project]
+ *     summary: Get all projects
+ *     responses:
+ *       200:
+ *         description: List of projects
+ */
+
+/**
+ * @openapi
+ * /project/get/{id}:
+ *   get:
+ *     tags: [Project]
+ *     summary: Get a project by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Project object
+ */
+
+/**
+ * @openapi
+ * /project/student/{studentId}:
+ *   get:
+ *     tags: [Project]
+ *     summary: Get projects for a student (protected)
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of projects
+ */
+
+/**
+ * @openapi
+ * /project/{projectId}/{administratorId}:
+ *   put:
+ *     tags: [Project]
+ *     summary: Assign an administrator to a project (protected)
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *       - in: path
+ *         name: administratorId
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Assignment result
+ */
+
+/**
+ * @openapi
+ * /project/{id}:
+ *   delete:
+ *     tags: [Project]
+ *     summary: Delete a project (protected)
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Deleted
+ */
