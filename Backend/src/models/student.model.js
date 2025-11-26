@@ -1,3 +1,25 @@
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Student:
+ *       type: object
+ *       properties:
+ *         carnet:
+ *           type: string
+ *         name:
+ *           type: string
+ *         hours:
+ *           type: integer
+ *         picture:
+ *           type: string
+ *         email:
+ *           type: string
+ *         careers:
+ *           type: array
+ *           items:
+ *             type: string
+ */
 import { Schema, model } from "mongoose";
 
 // create the model with its respective attributes and data types
@@ -32,6 +54,12 @@ const studentSchema = new Schema({
       ref: "Career",
     },
   ],
+  role: {
+    type: String,
+    enum: ["admin", "student"],
+    default: "student",
+    required: true,
+  },
 });
 
 // constructor using the model previously created

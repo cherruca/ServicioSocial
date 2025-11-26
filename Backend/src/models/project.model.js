@@ -1,3 +1,29 @@
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Project:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         capacity:
+ *           type: integer
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *         finalDate:
+ *           type: string
+ *           format: date-time
+ *         institution:
+ *           type: string
+ *         description:
+ *           type: string
+ *         administrators:
+ *           type: array
+ *           items:
+ *             type: string
+ */
 import { Schema, model } from 'mongoose';
 
 // create the model with its respective attributes and data types
