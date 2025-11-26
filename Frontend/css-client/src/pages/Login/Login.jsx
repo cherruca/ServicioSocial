@@ -1,16 +1,16 @@
-import React from 'react';  
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';  
+import React from 'react';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../util/axiosInstance';
 import { useAuth } from '../../states/AuthContext';
 
-const Login = () => {  
-  const clientId = import.meta.env.VITE_CLIENT_ID;  
-  const navigate = useNavigate(); 
+const Login = () => {
+  const clientId = import.meta.env.VITE_CLIENT_ID;
+  const navigate = useNavigate();
   const { setLoading } = useAuth();
 
-  const handleSuccess = async (credentialResponse) => {  
-    console.log('Google Sign In Success', credentialResponse);  
+  const handleSuccess = async (credentialResponse) => {
+    console.log('Google Sign In Success', credentialResponse);
 
     const token = credentialResponse?.credential;
     if (!token) {
@@ -26,10 +26,15 @@ const Login = () => {
       if (typeof decodeFn === 'function') {
         decode = decodeFn(token);
       } else {
-        console.warn('[login] jwt-decode decode function not found, skipping local decode');
+        console.warn(
+          '[login] jwt-decode decode function not found, skipping local decode'
+        );
       }
     } catch (e) {
-      console.warn('[login] dynamic import of jwt-decode failed, skipping local decode', e);
+      console.warn(
+        '[login] dynamic import of jwt-decode failed, skipping local decode',
+        e
+      );
     }
     console.log('decoded:', decode);
 
@@ -37,12 +42,51 @@ const Login = () => {
     const payload = { token, decoded: decode };
 
     try {
-      
-      console.log('[login] sending /auth/login payload:', { tokenShort: `${token.slice(0,10)}...` });
+      console.log('[login] sending /auth/login payload:', {
+        tokenShort: `${token.slice(0, 10)}...`,
+      });
       const res = await axios.post('/auth/login', payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Backend /auth/login response:', res.status, res.data);
+
+      // Check if role is returned directly from /auth/login (for immediate admin detection)
+      const roleFromLogin = res.data?.role;
+      console.log(
+        '[login] roleFromLogin extracted:',
+        roleFromLogin,
+        'type:',
+        typeof roleFromLogin
+      );
+
+      if (roleFromLogin === 'administrator') {
+        console.log('[login] Admin detected! Redirecting to /admin');
+        localStorage.setItem('role', 'administrator');
+        if (res.data?.user) {
+          localStorage.setItem('dbUser', JSON.stringify(res.data.user));
+        }
+        // Also store user for AdminPage to read
+        let userToStore = null;
+        if (decode) {
+          userToStore = decode;
+        } else if (res.data && res.data.user) {
+          const db = res.data.user;
+          userToStore = {
+            name: db.name || db.email || 'Administrador',
+            email: db.email || '',
+            picture: db.picture || db.avatar || '',
+          };
+        } else {
+          userToStore = { email: '' };
+        }
+        localStorage.setItem('user', JSON.stringify(userToStore));
+        localStorage.setItem('token', token);
+        navigate('/admin', { replace: true });
+        return;
+      }
+
+      console.log('[login] Not admin, proceeding to student flow');
+
       // Store the decoded Google payload in localStorage as `user` so existing UI works.
       // If decoding failed (decode is null), synthesize a compatible object from backend response.
       let userToStore = null;
@@ -61,7 +105,7 @@ const Login = () => {
       }
       localStorage.setItem('user', JSON.stringify(userToStore));
       localStorage.setItem('token', token);
-      
+
       navigate('/user');
     } catch (err) {
       console.error('Backend verification failed - full error:', err);
@@ -79,33 +123,36 @@ const Login = () => {
       // ensure loading is cleared even if decode isn't available
       setLoading(false);
     }
-  };  
+  };
 
-  const handleError = () => {  
-    console.log('Google Sign In Error');  
-  };  
+  const handleError = () => {
+    console.log('Google Sign In Error');
+  };
 
-  return (  
-    <div className="flex items-center justify-center h-full bg-cover bg-center" style={{ backgroundImage: "url('/log.jpg')" }}>  
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm bg-opacity-90">  
-        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">  
-          Iniciar Sesión  
-        </h1>  
+  return (
+    <div
+      className="flex items-center justify-center h-full bg-cover bg-center"
+      style={{ backgroundImage: "url('/log.jpg')" }}
+    >
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm bg-opacity-90">
+        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
+          Iniciar Sesión
+        </h1>
 
-        <GoogleOAuthProvider clientId={clientId}>  
-          <GoogleLogin  
-            onSuccess={handleSuccess}  
-            onError={handleError}  
-            style={{ width: '100%' }}  
-          />  
-        </GoogleOAuthProvider>  
+        <GoogleOAuthProvider clientId={clientId}>
+          <GoogleLogin
+            onSuccess={handleSuccess}
+            onError={handleError}
+            style={{ width: '100%' }}
+          />
+        </GoogleOAuthProvider>
 
-        <p className="text-center text-gray-600 mt-4">  
-          Inicia sesión con tu cuenta de Google.  
-        </p>  
-      </div>  
-    </div>  
-  );  
-};  
+        <p className="text-center text-gray-600 mt-4">
+          Inicia sesión con tu cuenta de Google.
+        </p>
+      </div>
+    </div>
+  );
+};
 
 export default Login;

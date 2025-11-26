@@ -54,6 +54,12 @@ const studentSchema = new Schema({
       ref: "Career",
     },
   ],
+  role: {
+    type: String,
+    enum: ["admin", "student"],
+    default: "student",
+    required: true,
+  },
 });
 
 // constructor using the model previously created
