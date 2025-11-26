@@ -17,7 +17,7 @@ import {
     saveProject,
     getProjects,
     findProjectById,
-    assignAdministratorToProject,
+    
     deleteProject,
     findProjectByName,
     getProjectsByStudentId
@@ -124,41 +124,8 @@ const getProjectsByStudentIdController = async (req, res, next) => {
     }
 };
 
-const assingAdministratorToProjectController = async (req, res, next) => {
-    try {
-        const { administratorId, projectId } = req.params;
-
-        const project = await findProjectById(projectId);
-
-        await findAdministratorById(administratorId);
-
-        const projectUpdated = await assignAdministratorToProject(project, administratorId);
-        res.status(200).json({ message: 'Administrador asignado al proyecto', data: projectUpdated });
-    } catch (e) {
-        switch (e.code) {
-            case ProjectErrorCodes.PROJECT_NOT_FOUND:
-                next(createError(404, 'El proyecto no existe'));
-                break;
-            case ProjectErrorCodes.PROJECT_FETCH_BY_ID_FAILED:
-                next(createError(500, 'Error al buscar el proyecto por ID'));
-                break;
-            case AdministratorErrorCodes.ADMINISTRATOR_NOT_FOUND:
-                next(createError(404, 'El administrador no existe'));
-                break;
-            case AdministratorErrorCodes.ADMINISTRATOR_FETCH_FAILED:
-                next(createError(500, 'Error al obtener los administradors'));
-                break;
-            case AdministratorErrorCodes.PROJECT_ALREADY_ASSIGNED:
-                next(createError(400, 'El administrador ya fue asignado al proyecto'));
-                break;
-            case AdministratorErrorCodes.PROJECT_ASSIGN_FAILED:
-                next(createError(500, 'Error al asignar el proyecto al administrador'));
-                break;
-            default:
-                next(e);
-        }
-    }
-};
+// Administrator assignment is deprecated: administrators have global access and are
+// not stored on projects. The old assign endpoint has been removed from routes.
 
 /* 
     in order to delete an specific row from the entity try this:
@@ -204,7 +171,6 @@ export {
     getProjectsController,
     getProjectByIdController,
     getProjectsByStudentIdController,
-    assingAdministratorToProjectController,
     deleteProjectController
 };
 

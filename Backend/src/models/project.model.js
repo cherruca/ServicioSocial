@@ -19,7 +19,7 @@
  *           type: string
  *         description:
  *           type: string
- *         administrators:
+ *         students:
  *           type: array
  *           items:
  *             type: string
@@ -52,10 +52,10 @@ const projectSchema = new Schema({
         type: String,
         required: true
     },
-    administrators:[
+    students: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Administrator'
+            ref: 'Student'
         }
     ]
 })

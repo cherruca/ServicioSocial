@@ -13,9 +13,6 @@
  * - assingCareerToUserController(req, res, next)
  * - deleteUserController(req, res, next)
  */
-
-import { jwtDecode } from 'jwt-decode'; 
-
 import {
   saveUser,
   getUsers,
@@ -31,6 +28,7 @@ import {
 } from "../services/career.service.js";
 
 import createError from "http-errors";
+import { OAuth2Client } from 'google-auth-library';
 import { UserErrorCodes } from "../utils/errors/user.errorCodes.js";
 import { CareerErrorCodes } from "../utils/errors/career.errorCodes.js";
 
@@ -168,7 +166,7 @@ export const getUserByIdController = async (req, res, next) => {
  *               $ref: '#/components/schemas/User'
  */
 
-
+// WHO IM I
 /*
     receive a token and decode it to get the email and verify if exists in the database
 */
@@ -176,30 +174,29 @@ export const getUserFromToken = async (req, res, next) => {
   try {
     const { token } = req.body;
 
-    // Dynamically import `jwt-decode` to handle ESM/CJS interop reliably.
-    let decoded = null;
+    // Verify the Google ID token server-side for stronger security and
+    // reliable payload extraction.
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn('[getUserFromToken] GOOGLE_CLIENT_ID is not set');
+      return res.status(500).json({ message: 'Server misconfiguration' });
+    }
+
+    const client = new OAuth2Client(clientId);
+    let payload = null;
     try {
-      const jwtModule = await import("jwt-decode");
-      const decodeFn = jwtModule && (jwtModule.default ?? jwtModule);
-      if (typeof decodeFn === "function") {
-        decoded = decodeFn(token);
-      } else {
-        // If for some reason decode isn't available, fall back to null and let later code fail with 400.
-        decoded = null;
-      }
+      const ticket = await client.verifyIdToken({ idToken: token, audience: clientId });
+      payload = ticket.getPayload();
     } catch (err) {
-      console.warn(
-        "[getUserFromToken] dynamic import of jwt-decode failed:",
-        err && err.message ? err.message : err
-      );
-      decoded = null;
+      console.warn('[getUserFromToken] token verification failed:', err && err.message ? err.message : err);
+      return res.status(400).json({ message: 'Invalid token' });
     }
 
-    if (!decoded || !decoded.email) {
-      return res.status(400).json({ message: "Invalid token" });
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: 'Invalid token payload' });
     }
 
-    const email = decoded.email;
+    const email = payload.email;
 
     // Prefer a persistent User record (this allows admins created as Users to be recognized),
     // otherwise fall back to Student records for UCA accounts.
@@ -253,7 +250,6 @@ export const getUserFromToken = async (req, res, next) => {
     }
   }
 };
-
 
 /**
  * @openapi

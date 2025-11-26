@@ -3,7 +3,6 @@ import attachUserFromGoogleToken, { requireAuth } from '../middleware/auth.middl
 import {
     createProjectController,
     getProjectsController,
-    assingAdministratorToProjectController,
     deleteProjectController,
     getProjectByIdController,
     getProjectsByStudentIdController
@@ -85,7 +84,6 @@ projectRouter.get('/get/:id', getProjectByIdController);
  *       200:
  *         description: Assigned
  */
-projectRouter.put('/:projectId/:administratorId', attachUserFromGoogleToken, requireAuth, assingAdministratorToProjectController);
 
 /**
  * @openapi

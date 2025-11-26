@@ -46,11 +46,20 @@ export const savePetition = async (petition) => {
 */
 export const getPetitions = async () => {
     try {
-        // const petitions = await Petition.find().populate('administrators');
-        const petitions = await Petition.find().populate('students').populate('administrators').populate('projects');
+        // Administrators are global — petitions no longer track assigned administrators
+        const petitions = await Petition.find().populate('students').populate('projects');
         return petitions;
     } catch (error) {
         throw new ServiceError('Error al obtener las solicitudes ', PetitionErrorCodes.PETITION_FETCH_FAILED);
+    }
+}
+
+export const getPetitionsByStudentId = async (studentId) => {
+    try {
+        const petitions = await Petition.find({ students: studentId }).populate('students').populate('projects');
+        return petitions;
+    } catch (error) {
+        throw new ServiceError('Error al obtener las solicitudes del estudiante', PetitionErrorCodes.PETITION_FETCH_FAILED);
     }
 }
 
@@ -70,20 +79,7 @@ export const getPetitions = async () => {
 //     }
 // }
 
-export const assignAdministratorToPetition = async (petition, administratorId) => {
-    try {
-        console.log("XD");
-        const existAdministrator = petition.administrators.find(administrator => administrator.toString() === administratorId);
-
-        if (existAdministrator) throw new ServiceError('El administrador ya fue asignado a la solicitud', PetitionErrorCodes.PETITION_ALREADY_ASSIGNED);
-
-        petition.administrators.push(administratorId);
-        const petitionUpdated = await petition.save();
-        return petitionUpdated;
-    } catch (error) {
-        throw new ServiceError('Error al asignar el administrador a la solicitud', error.code|| PetitionErrorCodes.PETITION_ASSIGN_FAILED);
-    }
-}
+// assignAdministratorToPetition removed: administrators are global and not stored on petitions.
 
 /* 
     get an specific row from an entity using its id, try:

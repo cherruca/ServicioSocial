@@ -9,7 +9,8 @@
  *           type: string
  *           format: date-time
  *         status:
- *           type: boolean
+ *           type: string
+ *           enum: [pending, approved, rejected]
  *         students:
  *           type: array
  *           items:
@@ -18,10 +19,12 @@
  *           type: array
  *           items:
  *             type: string
- *         administrators:
- *           type: array
- *           items:
- *             type: string
+ *         approvedAt:
+ *           type: string
+ *           format: date-time
+ *         rejectionReason:
+ *           type: string
+ *
  */
 import { Schema, model } from 'mongoose';
 
@@ -31,8 +34,10 @@ const petitionSchema = new Schema({
         type: Date,
         default: Date.now()
     },
-    status:{
-        type: Boolean,
+    status: {
+        type: String,
+        enum: ['pending','approved','rejected'],
+        default: 'pending',
         required: true
     },
     students:[
@@ -48,12 +53,15 @@ const petitionSchema = new Schema({
             ref: 'Project'
         }
     ],
-    administrators:[
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Administrator'
-        }
-    ]
+    
+    approvedAt: {
+        type: Date,
+        required: false
+    },
+    rejectionReason: {
+        type: String,
+        required: false
+    }
 })
 
 // constructor using the model previously created

@@ -93,6 +93,15 @@ export const findAdministratorById = async (id) => {
     }
 }
 
+export const findAdministratorByEmail = async (email) => {
+    try {
+        const administrator = await Administrator.findOne({ email });
+        return administrator || null;
+    } catch (error) {
+        throw new ServiceError('Error al buscar el administrador por email', AdministratorErrorCodes.ADMINISTRATOR_SEARCH_FAILED);
+    }
+}
+
 // export const deleteBookFromAdministrator = async (bookId) => {
 //     try {
 //         const updatesAdministrators = await Administrator.updateMany({ books: bookId }, { $pull: { books: bookId } });

@@ -7,7 +7,6 @@
  * Exported functions:
  * - createPetitionController
  * - getPetitionsController
- * - assingAdministratorToPetitionController
  * - deletePetitionController
  * - getPetitionByIdController
  * - enrollProjectController
@@ -19,9 +18,9 @@ import {
     getPetitions,
     findPetitionById,
     deletePetition,
-    assignAdministratorToPetition,
-    findPetitionByStudentAndProject,   // <-- FALTA
-    unassignProjectFromPetition        // <-- FALTA
+    findPetitionByStudentAndProject,
+    unassignProjectFromPetition,
+    getPetitionsByStudentId
 } from '../services/petition.service.js';
 import {
     findAdministratorById
@@ -32,6 +31,8 @@ import createError from 'http-errors';
 import {PetitionErrorCodes} from '../utils/errors/petition.errorCodes.js';
 import { AdministratorErrorCodes } from '../utils/errors/administrator.errorCodes.js';
 import { Petition } from '../models/petition.model.js';
+import { Project } from '../models/project.model.js';
+import { findAdministratorByEmail } from '../services/administrator.service.js';
 
 
 /* 
@@ -104,6 +105,24 @@ export const getPetitionsController = async (req, res, next) => {
     }
 }
 
+export const getMyPetitionsController = async (req, res, next) => {
+    try {
+        // req.user is attached by attachUserFromGoogleToken middleware
+        const email = req.user && req.user.email;
+        if (!email) return res.status(200).json({ data: [] });
+
+        // find student by email
+        const { findStudentByEmail } = await import('../services/student.service.js');
+        const student = await findStudentByEmail(email);
+        if (!student) return res.status(200).json({ data: [] });
+
+        const petitions = await getPetitionsByStudentId(student._id);
+        return res.status(200).json({ data: petitions });
+    } catch (e) {
+        next(e);
+    }
+}
+
 /**
  * @openapi
  * /petition/petitions:
@@ -165,13 +184,9 @@ export const getPetitionByIdController = async (req, res, next) => {
 export const assingAdministratorToPetitionController = async (req, res, next) => {
     try {
         const { petitionId, administratorId } = req.params;
-
-        const petition = await findPetitionById(petitionId);
-
-        await findAdministratorById(administratorId);
-
-        const petitionUpdated = await assignAdministratorToPetition(petition, administratorId);
-        res.status(200).json({ message: 'Administrador asignado a la solicitud', data: petitionUpdated });
+        // Deprecated: petitions no longer store assigned administrators.
+        // Administrators have global access and can act on any petition.
+        return res.status(400).json({ message: 'Operation not supported: petitions do not store assigned administrators' });
     } catch (e) {
         switch (e.code) {
             case PetitionErrorCodes.PETITION_NOT_FOUND:
@@ -298,10 +313,9 @@ export const enrollProjectController = async (req, res, next) => {
 
         const petitionData = {
             date: Date.now(),
-            status: false, // pendiente
+            status: 'pending', // pendiente
             students: [studentId],
-            projects: [projectId],
-            administrators: []
+            projects: [projectId]
         };
 
         const created = await savePetition(petitionData);
@@ -385,6 +399,107 @@ export const isEnrolledController = async (req, res, next) => {
         next(e);
     }
 };
+
+/**
+ * Approve a pending petition: atomically add student to project (if capacity),
+ * decrement capacity, and mark petition approved by admin.
+ */
+export const approvePetitionController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const petition = await findPetitionById(id);
+        if (!petition) return next(createError(404, 'La solicitud no existe'));
+        if (petition.status !== 'pending') return next(createError(400, 'La solicitud no está pendiente'));
+
+        const studentId = petition.students[0];
+        const projectId = petition.projects[0];
+
+        // Atomic update: only succeed if capacity > 0 and student not already in students
+        const updatedProject = await Project.findOneAndUpdate(
+            { _id: projectId, capacity: { $gt: 0 }, students: { $ne: studentId } },
+            { $inc: { capacity: -1 }, $addToSet: { students: studentId } },
+            { new: true }
+        );
+
+        if (!updatedProject) {
+            return next(createError(400, 'Capacidad insuficiente o el estudiante ya está inscrito'));
+        }
+
+        // mark approved
+        petition.status = 'approved';
+        petition.approvedAt = new Date();
+        await petition.save();
+
+        res.status(200).json({ message: 'Solicitud aprobada', data: { petition, project: updatedProject } });
+    } catch (e) {
+        next(e);
+    }
+}
+
+/**
+ * @openapi
+ * /petition/{id}/approve:
+ *   patch:
+ *     tags: [Petition]
+ *     summary: Approve a petition (admin only)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Petition approved
+ */
+
+/**
+ * Reject a pending petition: mark petition rejected and optionally record reason.
+ */
+export const rejectPetitionController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { reason } = req.body || {};
+        const petition = await findPetitionById(id);
+        if (!petition) return next(createError(404, 'La solicitud no existe'));
+        if (petition.status !== 'pending') return next(createError(400, 'La solicitud no está pendiente'));
+
+        petition.status = 'rejected';
+        petition.approvedAt = new Date();
+        petition.rejectionReason = reason || '';
+        await petition.save();
+
+        res.status(200).json({ message: 'Solicitud rechazada', data: petition });
+    } catch (e) {
+        next(e);
+    }
+}
+
+/**
+ * @openapi
+ * /petition/{id}/reject:
+ *   patch:
+ *     tags: [Petition]
+ *     summary: Reject a petition (admin only)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Petition rejected
+ */
 
 /**
  * @openapi

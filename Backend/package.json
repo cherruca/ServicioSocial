@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "test": "jest --runInBand",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "migrate:petitions": "node ./scripts/migratePetitionStatus.js",
+    "clear:petitions": "node ./scripts/clearPetitions.js",
+    "seed:petitions": "node ./scripts/seedPetitions.js"
   },
   "keywords": [],
   "author": "",

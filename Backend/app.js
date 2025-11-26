@@ -9,7 +9,7 @@ import swaggerSpec from "./src/config/swagger.config.js";
 
 const corsOptions = {
   origin: ["http://localhost:5173"], // Especificar orígenes permitidos CROSS ORIGIN uwu
-  methods: ["GET", "POST", "PUT", "DELETE"], // Métodos permitidos
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Métodos permitidos (incluye PATCH)
   allowedHeaders: ["Content-Type", "Authorization"], // Encabezados permitidos
   credentials: true, // Permitir credenciales como cookies
 };
@@ -21,7 +21,6 @@ if (process.env.NODE_ENV !== "test") {
 }
 app.use(cors(corsOptions));
 app.use(express.json());
-
 // Set Cross-Origin-Opener-Policy header to allow OAuth popups
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
@@ -30,7 +29,6 @@ app.use((req, res, next) => {
 // Swagger UI and JSON spec
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get("/api-docs.json", (req, res) => res.json(swaggerSpec));
-
 
 app.use(mainRouter);
 app.use(errorHandler);

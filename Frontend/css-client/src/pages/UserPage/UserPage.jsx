@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../util/axiosInstance';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../states/AuthContext';
 
 const UserPage = () => {
@@ -134,8 +135,6 @@ const UserPage = () => {
           <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">
             Centro de Servicio Social
           </h1>
-
-          
         </div>
 
         {/* --- Tarjetas de información --- */}
@@ -158,26 +157,41 @@ const UserPage = () => {
             </div>
           </div>
 
-          <div className="bg-blue-200 p-6 rounded-lg shadow-md mb-6 w-full transition-transform transform hover:scale-[1.02] hover:shadow-xl">
-            <h2 className="text-lg font-semibold text-center mb-4">
-              Servicios sociales activos
-            </h2>
-            <ul className="list-disc list-inside">
-              <li>Apoyo en laboratorio de cómputo</li>
-              <li>Tutorías de programación básica</li>
-              <li>Soporte técnico a la comunidad UCA</li>
-            </ul>
-          </div>
+          <div className="grid grid-cols-1 gap-6">
+            <div className="bg-blue-200 p-6 rounded-lg shadow-md w-full transition-transform transform hover:scale-[1.02] hover:shadow-xl">
+              <h2 className="text-lg font-semibold text-center mb-4">
+                Servicios sociales activos
+              </h2>
+              <p className="text-center mb-4">
+                Aquí verás los proyectos en los que estés inscrito y aprobados
+                por un administrador.
+              </p>
+              <div className="flex justify-center">
+                <Link
+                  to="/my-active-projects"
+                  className="bg-blue-800 text-white px-4 py-2 rounded"
+                >
+                  Ver mis servicios activos
+                </Link>
+              </div>
+            </div>
 
-          <div className="bg-blue-200 p-6 rounded-lg shadow-md w-full transition-transform transform hover:scale-[1.02] hover:shadow-xl">
-            <h2 className="text-lg font-semibold text-center mb-4">
-              Listado de proyectos de servicios sociales
-            </h2>
-            <ul className="list-disc list-inside">
-              <li>Proyecto 1: Plataforma de gestión de servicio social</li>
-              <li>Proyecto 2: Soporte a laboratorios de la FIA</li>
-              <li>Proyecto 3: Acompañamiento a estudiantes de nuevo ingreso</li>
-            </ul>
+            <div className="bg-blue-200 p-6 rounded-lg shadow-md w-full transition-transform transform hover:scale-[1.02] hover:shadow-xl">
+              <h2 className="text-lg font-semibold text-center mb-4">
+                Listado de proyectos de servicios sociales
+              </h2>
+              <p className="text-center mb-4">
+                Explora los proyectos disponibles y solicita inscripción.
+              </p>
+              <div className="flex justify-center">
+                <Link
+                  to="/projects-list"
+                  className="bg-blue-800 text-white px-4 py-2 rounded"
+                >
+                  Ver listado de proyectos
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </main>

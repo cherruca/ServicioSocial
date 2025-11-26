@@ -49,8 +49,8 @@ export const saveProject = async (project) => {
 */
 export const getProjects = async () => {
     try {
-        // const projects = await Project.find().populate('administrators');
-        const projects = await Project.find().populate('administrators');
+        // Administrators are global — projects no longer track assigned administrators
+        const projects = await Project.find().populate('students');
         return projects;
     } catch (error) {
         throw new ServiceError('Error al obtener los proyectos ', ProjectErrorCodes.PROJECT_FETCH_FAILED);
@@ -73,18 +73,7 @@ export const findProjectByName = async (name) => {
     }
 }
 
-export const assignAdministratorToProject = async (project, administratorId) => {
-    try {
-        const existAdministrator = project.administrators.find(administrator => administrator.toString() === administratorId);
-        if (existAdministrator) throw new ServiceError('El administrador ya fue asignado al proyecto', ProjectErrorCodes.BOOK_ALREADY_ASSIGNED);
-
-        project.administrators.push(administratorId);
-        const projectUpdated = await project.save();
-        return projectUpdated;
-    } catch (error) {
-        throw new ServiceError('Error al asignar el administrador al proyecto', error.code|| ProjectErrorCodes.BOOK_ASSIGN_FAILED);
-    }
-}
+// assignAdministratorToProject removed: administrators are global and not stored on projects.
 
 /* 
     get an specific row from an entity using its id, try:
@@ -110,7 +99,7 @@ export const findProjectById = async (id) => {
  */
 export const getProjectsByStudentId = async (studentId) => {
     try {
-        const projects = await Project.find({ students: studentId }).populate('administrators').populate('students');
+        const projects = await Project.find({ students: studentId }).populate('students');
         return projects;
     } catch (error) {
         throw new ServiceError('Error al obtener los proyectos del estudiante', ProjectErrorCodes.PROJECT_FETCH_FAILED);

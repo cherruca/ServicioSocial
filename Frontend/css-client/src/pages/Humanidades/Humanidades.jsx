@@ -30,7 +30,7 @@ const Humanidades = () => {
               <th className="py-2 px-4 border">Fecha de Inicio</th>
               <th className="py-2 px-4 border">Fecha de Finalización</th>
               <th className="py-2 px-4 border">Institución</th>
-              <th className="py-2 px-4 border">Encargado</th>
+              <th className="py-2 px-4 border">Participantes</th>
             </tr>
           </thead>
           <tbody>
@@ -47,18 +47,7 @@ const Humanidades = () => {
                     {new Date(project.finalDate).toLocaleDateString()}
                   </td>
                   <td className="py-2 px-4 border">{project.institution}</td>
-                  <td className="py-2 px-4 border">
-                    {project.administrators.length > 0 ? (
-                      project.administrators.map((admin) => (
-                        <div key={admin._id}>
-                          <strong>{admin.name}</strong> <br />
-                          <span>{admin.email}</span>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No hay administradores asignados.</p>
-                    )}
-                  </td>
+                  <td className="py-2 px-4 border">{project.students?.length ?? 0}</td>
                 </tr>
               ))
             ) : (

@@ -4,13 +4,15 @@ import attachUserFromGoogleToken, { requireAuth } from '../middleware/auth.middl
 import {
     createPetitionController,
     getPetitionsController,
-    assingAdministratorToPetitionController,
     deletePetitionController,
     getPetitionByIdController,
     enrollProjectController,  //IMPORTACIÓN NUEVA
     unassignProjectFromPetitionController,
     isEnrolledController 
 } from '../controllers/petition.controller.js';
+import { getMyPetitionsController } from '../controllers/petition.controller.js';
+import { approvePetitionController, rejectPetitionController } from '../controllers/petition.controller.js';
+import { requireAdmin } from '../middleware/admin.middleware.js';
 
 const petitionRouter = Router();
 
@@ -40,6 +42,9 @@ const petitionRouter = Router();
  */
 petitionRouter.post('/enroll', enrollProjectController);
 
+// Get petitions for the authenticated student
+petitionRouter.get('/my', attachUserFromGoogleToken, requireAuth, getMyPetitionsController);
+
 /**
  * @openapi
  * /petition/petitions:
@@ -68,26 +73,11 @@ petitionRouter.get('/petitions', getPetitionsController);
  */
 petitionRouter.get('/:id', getPetitionByIdController);
 
-/**
- * @openapi
- * /petition/{petitionId}/{administratorId}:
- *   put:
- *     tags: [Petition]
- *     summary: Assign administrator to petition (protected)
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: petitionId
- *         required: true
- *       - in: path
- *         name: administratorId
- *         required: true
- *     responses:
- *       200:
- *         description: Assigned
- */
-petitionRouter.put('/:petitionId/:administratorId', attachUserFromGoogleToken, requireAuth, assingAdministratorToPetitionController);
+
+
+// Admin actions: approve / reject
+petitionRouter.patch('/:id/approve', attachUserFromGoogleToken, requireAdmin, approvePetitionController);
+petitionRouter.patch('/:id/reject', attachUserFromGoogleToken, requireAdmin, rejectPetitionController);
 
 /**
  * @openapi

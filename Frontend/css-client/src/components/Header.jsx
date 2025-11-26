@@ -32,7 +32,8 @@ const Header = () => {
   };
   
   // Determinar la ruta a la que debe ir la foto/ícono
-  const targetPage = isLoggedIn ? pages.user : pages.login;
+  const storedRole = typeof window !== 'undefined' ? (localStorage.getItem('role') || '') : '';
+  const targetPage = isLoggedIn ? (storedRole.toLowerCase().includes('admin') ? pages.admin : pages.user) : pages.login;
 
   return (
     <header className="bg-background text-white">
@@ -61,8 +62,8 @@ const Header = () => {
           
           {isLoggedIn && isMenuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-              <Link 
-                to={pages.user}
+              <Link
+                to={targetPage}
                 onClick={() => setIsMenuOpen(false)}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
@@ -79,29 +80,31 @@ const Header = () => {
         </div>
       </div>
       
-      {/* Barra de navegación */}
-      <nav className="bg-secondary">
-        <ul className="flex justify-center list-none p-2 m-0">
-          <li className="mx-4">
-            <Link to={pages.home} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Inicio</Link>
-          </li>
-          <li className="mx-4">
-            <Link to={pages.css} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">CSS</Link>
-          </li>
-          <li className="mx-4">
-            <Link to={pages.contacts} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Contacto</Link>
-          </li>
-          <li className="mx-4">
-            <Link to={pages.circles} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Círculos de estudio</Link>
-          </li>
-          <li className="mx-4">
-            <Link to={pages.suggestions} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Sugerencias</Link>
-          </li>
-          <li className="mx-4">
-            <Link to={pages.documents} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Documentos</Link>
-          </li>
-        </ul>
-      </nav>
+      {/* Barra de navegación: ocultar cuando el usuario está logueado para vista limpia */}
+      {!isLoggedIn && (
+        <nav className="bg-secondary">
+          <ul className="flex justify-center list-none p-2 m-0">
+            <li className="mx-4">
+              <Link to={pages.home} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Inicio</Link>
+            </li>
+            <li className="mx-4">
+              <Link to={pages.css} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">CSS</Link>
+            </li>
+            <li className="mx-4">
+              <Link to={pages.contacts} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Contacto</Link>
+            </li>
+            <li className="mx-4">
+              <Link to={pages.circles} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Círculos de estudio</Link>
+            </li>
+            <li className="mx-4">
+              <Link to={pages.suggestions} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Sugerencias</Link>
+            </li>
+            <li className="mx-4">
+              <Link to={pages.documents} className="text-blue-900 font-bold hover:text-blue-700 transition-colors">Documentos</Link>
+            </li>
+          </ul>
+        </nav>
+      )}
     </header>
   );
 };
