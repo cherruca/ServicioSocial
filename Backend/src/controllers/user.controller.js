@@ -13,6 +13,9 @@
  * - assingCareerToUserController(req, res, next)
  * - deleteUserController(req, res, next)
  */
+
+import { jwtDecode } from 'jwt-decode'; 
+
 import {
   saveUser,
   getUsers,
@@ -165,7 +168,7 @@ export const getUserByIdController = async (req, res, next) => {
  *               $ref: '#/components/schemas/User'
  */
 
-// WHO IM I
+
 /*
     receive a token and decode it to get the email and verify if exists in the database
 */
@@ -250,6 +253,7 @@ export const getUserFromToken = async (req, res, next) => {
     }
   }
 };
+
 
 /**
  * @openapi

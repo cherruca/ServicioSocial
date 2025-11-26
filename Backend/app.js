@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== "test") {
 }
 app.use(cors(corsOptions));
 app.use(express.json());
+
 // Set Cross-Origin-Opener-Policy header to allow OAuth popups
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 // Swagger UI and JSON spec
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get("/api-docs.json", (req, res) => res.json(swaggerSpec));
+
 
 app.use(mainRouter);
 app.use(errorHandler);
