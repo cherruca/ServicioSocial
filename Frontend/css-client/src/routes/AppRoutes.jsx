@@ -20,8 +20,8 @@ import SocialServiceCenter from '../pages/SocialServiceCenter';
 import ProjectManagement from '../pages/ProjectManagement';
 import ProjectForm from '../pages/ProjectForm';
 import ProjectList from '../pages/ProjectList';
+import ActiveProjects from '../pages/ActiveProjects';
 import AdminPage from '../pages/AdminPage/AdminPage';
-
 
 const AppRoutes = () => {
   return (
@@ -41,16 +41,15 @@ const AppRoutes = () => {
         <Route path={pages.user} element={<UserPage />} />
         <Route path={pages.admin} element={<AdminPage />} />
 
-        <Route path={pages.socialservice}element={<SocialServiceCenter />} />
+        <Route path={pages.socialservice} element={<SocialServiceCenter />} />
         <Route path={pages.projectlist} element={<ProjectList />} />
+        <Route path={pages.activeprojects} element={<ActiveProjects />} />
       </Route>
       <Route path={pages.petitionview} element={<PetitionView />} />
       <Route path={pages.listfaculty} element={<ListFaculty />} />
       <Route path={pages.projectmanagement} element={<ProjectManagement />} />
       <Route path={pages.projectform} element={<ProjectForm />} />{' '}
       <Route path="*" element={<div>404</div>} />
-      
-      
     </Routes>
   );
 };

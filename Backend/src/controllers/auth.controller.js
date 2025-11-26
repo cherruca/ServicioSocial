@@ -9,14 +9,12 @@
  * Exported functions:
  * - login(req, res, next)
  */
-
 import { attachUserFromGoogleToken } from "../middleware/auth.middleware.js";
 import { findUserByEmail, saveUser } from "../services/user.service.js";
 import {
   findStudentByEmail,
   saveStudent,
 } from "../services/student.service.js";
-
 
 // Controller to handle login with Google ID token.
 // If a persistent user does not exist, create one with sensible defaults.

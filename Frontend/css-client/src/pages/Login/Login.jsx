@@ -7,7 +7,7 @@ import { useAuth } from '../../states/AuthContext';
 const Login = () => {
   const clientId = import.meta.env.VITE_CLIENT_ID;
   const navigate = useNavigate();
-  const { setLoading } = useAuth();
+  const { login } = useAuth();
 
   const handleSuccess = async (credentialResponse) => {
     console.log('Google Sign In Success', credentialResponse);
@@ -81,6 +81,10 @@ const Login = () => {
         }
         localStorage.setItem('user', JSON.stringify(userToStore));
         localStorage.setItem('token', token);
+        // Update Auth context immediately so header and other components refresh
+        try {
+          login(userToStore);
+        } catch (e) {}
         navigate('/admin', { replace: true });
         return;
       }
@@ -105,6 +109,9 @@ const Login = () => {
       }
       localStorage.setItem('user', JSON.stringify(userToStore));
       localStorage.setItem('token', token);
+      try {
+        login(userToStore);
+      } catch (e) {}
 
       navigate('/user');
     } catch (err) {

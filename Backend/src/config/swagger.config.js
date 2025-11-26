@@ -5,11 +5,9 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-
-      title: 'ServicioSocial API',
+      title: 'Proyecto API',
       version: '1.0.0',
-      description: 'API documentation for ServicioSocial backend'
-
+      description: 'API documentation for ProyectoDanie backend'
     },
     servers: [
       {

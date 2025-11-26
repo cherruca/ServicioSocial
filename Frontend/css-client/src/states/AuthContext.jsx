@@ -1,6 +1,6 @@
 // src/states/AuthContext.jsx
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
 
 // 1. Crear el Contexto
 export const AuthContext = createContext();
@@ -29,28 +29,31 @@ export const AuthProvider = ({ children }) => {
   const profilePicture = user?.picture || user?.imageUrl || null;
 
   // Función para iniciar sesión (se llama después de un login exitoso)
-  const login = (userData) => {
+  const login = useCallback((userData) => {
     // Asume que UserPage ya guardó 'user' y 'token' en localStorage
     setUser(userData);
-  };
+  }, []);
 
   // Función para cerrar sesión (limpia localStorage y estado)
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('dbUser');
     setUser(null);
-  };
+  }, []);
 
   // El valor que se proveerá a todos los componentes hijos
-  const contextValue = {
-    user,
-    profilePicture,
-    isLoggedIn: !!user,
-    login,
-    logout,
-  };
+  const contextValue = useMemo(
+    () => ({
+      user,
+      profilePicture,
+      isLoggedIn: !!user,
+      login,
+      logout,
+    }),
+    [user, profilePicture, login, logout]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>

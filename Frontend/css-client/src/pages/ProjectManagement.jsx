@@ -66,19 +66,8 @@ const ProjectManagement = () => {
                 <strong>Descripción:</strong> {project.description}
               </p>
 
-              <h3 className="font-semibold mt-4">Encargado:</h3>
-              {project.administrators.length > 0 ? (
-                <ul className="list-disc list-inside">
-                  {project.administrators.map((admin) => (
-                    <p key={admin._id}>
-                      <strong>Nombre:</strong> {admin.name} <br />
-                      <strong>Email:</strong> {admin.email}
-                    </p>
-                  ))}
-                </ul>
-              ) : (
-                <p>No hay administradores asignados.</p>
-              )}
+              <h3 className="font-semibold mt-4">Participantes:</h3>
+              <p>{project.students?.length ?? 0} inscritos</p>
 
               <div className="flex justify-between mt-4">
                 {/* <button
