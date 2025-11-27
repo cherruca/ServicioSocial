@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest --runInBand",
     "dev": "nodemon app.js",
+    "build": "vite build",
     "migrate:petitions": "node ./scripts/migratePetitionStatus.js",
     "clear:petitions": "node ./scripts/clearPetitions.js",
     "seed:petitions": "node ./scripts/seedPetitions.js"
